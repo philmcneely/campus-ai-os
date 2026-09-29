@@ -29,7 +29,7 @@ The wiki follows the Karpathy LLM Wiki pattern: **synthesis happens at ingest ti
 
 ## The Categories (FIXED at runtime — do not invent new ones)
 
-**The category list comes from the active pack, not from this file.** Read `packs/{active_pack}/pack.json` → `wiki_taxonomy` before routing anything. Each entry gives a `category` (the folder name) and `what` (what belongs in it).
+**The category list comes from the active pack, not from this file.** Read `packs/{active_pack}/pack.json` → `wiki_taxonomy` before routing anything (`active_pack` is named in `packs/active.json`). Each entry gives a `category` (the folder name) and `what` (what belongs in it).
 
 The rule is unchanged and absolute: **the list you read is the complete list.** Every page belongs to exactly one category on it. If you can't classify something into one of them, it doesn't belong in the wiki. Never create a folder that isn't on the list.
 

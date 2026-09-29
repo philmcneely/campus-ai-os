@@ -3,7 +3,8 @@ name: campus-first-win
 description: >
   Produce the owner's first real deliverable within 10 minutes of install. Picks
   the deliverable by delivery type from workspace.json - community prompts,
-  a lesson plan, or a session prep pack - and saves it to outputs/. Use when
+  a lesson plan, or a session prep pack - or offers the active pack's own
+  domain skill when the pack ships one, and saves it to outputs/. Use when
   the owner says "/campus-first-win", "show me what you can do", or right after /campus-start.
 version: 3.0.0
 department: kernel
@@ -28,6 +29,11 @@ Requires `workspace.json` (run /campus-start first if missing). Works fine with 
 | courses | a complete lesson plan for their next topic (ask which topic - one question) |
 | coaching | a session prep pack for their next call (ask who/what - one question) |
 | mix | ask: "Which would help most this week?" and offer the three above |
+
+**The active pack's own work (5.3.0).** Read `packs/active.json` -> `active_pack`, then `packs/{active_pack}/pack.json` in this plugin, and take its `domain_skills[]`.
+
+- If that list is missing or empty, or already includes `community-pulse`, `lesson-planner` or `session-planner`, the table above is this pack's first win: use it unchanged.
+- Otherwise, offer each installed skill in that list (at most three) beside the table's deliverable, in the same one question, naming each by its deliverable from that skill's own `description`; produce the one the owner picks by following that skill's SKILL.md.
 
 At most ONE question before producing. If the answer is vague, make a sensible
 choice and say so.
@@ -61,7 +67,7 @@ Offer exactly one next action, chosen by delivery type  -  e.g. "Want me to draf
 the next one, or set this up to happen weekly?" If they take the weekly offer,
 that becomes their first scheduled task.
 
-Log the run to dean/.activity.jsonl (skill: "campus-first-win"). If the owner renamed their chief of staff, speak as that name.
+Log the run to the ledger your seat resolves to (`.campus-os/ledger-paths.md`) (skill: "campus-first-win"). If the owner renamed their chief of staff, speak as that name.
 
 ## Rules
 

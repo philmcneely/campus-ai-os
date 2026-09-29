@@ -47,7 +47,7 @@ If the light engine is unavailable or errors, the stage **runs `full`** and the 
 
 ## Ledger proof
 
-Every playbook stage line in `dean/.activity.jsonl` carries `tier_requested` and `tier_used`, stamped at that stage's completion (per-stage timestamps). A real routed run shows `tier_used: light` on the light stages and `full` on the pinned/full stages.
+Every playbook stage line in the activity ledger (the clock owner's `dean/.activity.jsonl` or the seat's own shard) carries `tier_requested` and `tier_used`, stamped at that stage's completion (per-stage timestamps). A real routed run shows `tier_used: light` on the light stages and `full` on the pinned/full stages.
 
 ---
 

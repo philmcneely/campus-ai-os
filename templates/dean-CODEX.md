@@ -156,7 +156,7 @@ Nothing goes in the workspace root.
    pattern), write it to `wiki/` and note it in `wiki/index.md`.
 4. Write or update `daily/{today}.md`  -  a short note on what happened.
 5. **Append the activity ledger**  -  one JSON line per completed workflow to
-   `dean/.activity.jsonl`:
+   the ledger file your seat resolves to (`.campus-os/ledger-paths.md`; `dean/.activity.jsonl` only when this client is the clock owner or the campus has one client):
 
    ```json
    {"ts":"{ISO 8601}","session":"{n}","skill":"{skill name or 'ad-hoc'}","trigger":"{owner's short request phrase}","team":"{team or null}","outcome":"completed|errored|abandoned","files_touched":{n}}

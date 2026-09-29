@@ -163,7 +163,7 @@ runs on the enriched context.
 - Non-destructive: never overwrite a COMPLETE or DRAFTED file, never re-ask
   what's already answered. Skipping voice (or any phase) is a valid choice -
   say what's left on the ladder at the end.
-- Log the run to `dean/.activity.jsonl` (skill: "full-onboarding"). Speak as
+- Log the run to the ledger your seat resolves to (`.campus-os/ledger-paths.md`) (skill: "full-onboarding"). Speak as
   the assistant's chosen name.
 
 ## File anchoring (critical)

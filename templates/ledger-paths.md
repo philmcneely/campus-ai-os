@@ -23,11 +23,11 @@ Resolve `LEDGER_CANON` in this order, first hit wins:
 
 ## Resolving your seat
 
-Run `python3 {campus_root}/.campus-os/resolve-seat.py --client <actual-client>` once at startup, using the client identified by the host: `claude-cowork`, `claude-code`, or `codex`. Use the returned `seat`, `role`, `ledger`, `lane`, and `via`. Do not select a client to obtain a desired role. The resolver checks a stable machine fingerprint against the explicit client assignment; `mounted_at`, home-directory names, and model names never establish identity. Top-level `seat`/`role` in seat.json describe the primary owner for legacy metadata, not every caller.
+Run `python3 {campus_root}/.campus-os/resolve-seat.py --client <actual-client>` once at startup, using the client identified by the host: `claude-cowork`, `claude-code`, or `codex`. Use the returned `seat`, `role`, `owns_clock`, `ledger`, `lane`, and `via`. Do not select a client to obtain a desired role. The resolver checks a stable machine fingerprint against the explicit client assignment; `mounted_at`, home-directory names, and model names never establish identity. Top-level `seat`/`role` in seat.json describe the primary owner for legacy metadata, not every caller.
 
 If the resolver reports a warning, exits 2, or cannot run, visibly report the identity failure and operate as an unassigned satellite; never silently assume primary. If the host cannot expose its machine identity (for example a sandboxed Cowork container), primary access requires a verified host-side binding: `.campus-os/host-binding.json`, issued only where the fingerprint is observed by `resolve-seat.py --issue-binding --client <primary-client>`, short-lived (default 12 hours, never more than 24), and consulted only when the fingerprint is unavailable. A binding never overrides a fingerprint mismatch; do not substitute the configured fingerprint as if it were observed. No directory-path fallback is allowed.
 
-Primary: `dean/.activity.jsonl`. Satellite: use the returned `ledger` exactly. Missing configuration never grants primary access.
+Use the returned `ledger` exactly, whatever your role. The clock-owner client (`owns_clock: true`) is the only writer of `dean/.activity.jsonl`; every other assigned client is primary by role and appends to its own shard, `dean/.activity.{seat}.jsonl`; a satellite does the same. Missing configuration never grants primary access.
 
 ## The write rule — exact
 
@@ -47,8 +47,8 @@ unchanged from the shape kernel readers have always parsed.
 
 A reader of "the campus activity ledger" reads **all** of these and merges:
 
-1. `dean/.activity.jsonl` — the primary ledger
-2. `dean/.activity.*.jsonl` — every satellite shard present (glob; there may be none)
+1. `dean/.activity.jsonl` — the shared ledger, written by the clock-owner client only
+2. `dean/.activity.*.jsonl` — every other seat's shard, co-primary or satellite (glob; there may be none)
 
 Skip blank lines and lines starting with `#` (header comments) in every file.
 Sort the merged set by `ts`. A line with no `seat` field predates the stamp and
@@ -68,8 +68,9 @@ every transport, and the read-side merge above means nothing downstream notices.
 Resolve the ledger through the campus copy of this file. Until you do, the
 sanctioned phrasing (enforced by `validate-team`) is:
 
-> Log one line to the campus activity ledger for your seat (primary seat:
-> `dean/.activity.jsonl`; satellite seats: `dean/.activity.{seat}.jsonl`), with `run_id`.
+> Log one line to the campus activity ledger for your seat (clock-owner seat: `dean/.activity.jsonl`; every other seat: `dean/.activity.{seat}.jsonl`), with `run_id`.
+
+Teams cut before 5.2.11 carry the older wording "primary seat: `dean/.activity.jsonl`"; read it as the clock-owner seat, since the resolver decides the ledger from `owns_clock`, never from role.
 
 **Disclosed residual (Seat Contract Phase 0, 2026-08-28):** teams shipped before
 this canon write `dean/.activity.jsonl` by literal path. That is correct on a

@@ -9,11 +9,11 @@ department: kernel
 
 Your AI staff already did the work — repeatedly, by hand. Recruit finds those repeats in the activity
 ledger and proposes each as a new hire (a skill candidate). Nothing is created without owner approval.
-This is the promote half of the loop whose capture half is Dean's activity ledger (`dean/.activity.jsonl` for the primary seat, `dean/.activity.{seat}.jsonl` for each satellite).
+This is the promote half of the loop whose capture half is Dean's activity ledger (`dean/.activity.jsonl` for the clock-owner seat, `dean/.activity.{seat}.jsonl` for every other seat).
 
 ## Inputs (all canonical kernel paths)
-1. **Ledger:** every activity ledger on the campus - the primary
-   `dean/.activity.jsonl` plus any satellite shard `dean/.activity.{seat}.jsonl`
+1. **Ledger:** every activity ledger on the campus - the shared (clock-owner)
+   `dean/.activity.jsonl` plus any other seat's shard `dean/.activity.{seat}.jsonl`
    (canon: `.campus-os/ledger-paths.md`). `cluster_ledger.py` merges them for
    you. Skip `#` header lines and malformed JSON.
 2. **Dedupe source:** `.campus-os/registry.json` (canonical — teams + playbooks + their triggers).

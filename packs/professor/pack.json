@@ -1,0 +1,275 @@
+{
+  "pack": "professor",
+  "label": "Professor",
+  "version": "5.2.11",
+  "identity": {
+    "business_noun": "academic practice",
+    "owner_line": "The owner is a university professor who wears many hats: teacher, researcher, grant writer, mentor, committee member, reviewer.",
+    "customer_noun": "students and funders",
+    "founding_frame": "You're not installing software. You're setting up an office for your academic work - one professor wearing many hats, backed by an AI staff that remembers everything and does real work. I'm your chief of staff: I run the office, route the work, and protect you from mistakes. Nothing reaches a student, a colleague, or a funder unless you send it yourself.",
+    "q1": "How are you using AI in your work today, if at all? Then tell me what your work is - what you teach, what you research, and what else lands on your desk.",
+    "q1_pushback": "Say it the way you'd explain your job to a new colleague in another department.",
+    "q2_examples": "teaching courses, research, grant proposals, mentoring students, committee work, reviewing grants or papers, guest talks"
+  },
+  "departments": [
+    "education",
+    "sales",
+    "operations",
+    "people"
+  ],
+  "managers": [
+    {
+      "id": "education",
+      "display_name": "Class Prep & Grading",
+      "dept_dir": "departments/education/",
+      "reports_to": "dean",
+      "shape": "calendar",
+      "state_file": "departments/education/class-schedule.md",
+      "state_stale_after_days": 8,
+      "cadence": [
+        {
+          "task": "class-scan",
+          "cron": "0 9 * * 1",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "finds class sessions needing prep, materials, or grading turnaround this week"
+        }
+      ],
+      "gates": {
+        "course_publish": {
+          "mode": "owner_batch_gate",
+          "note": "Course material reaches students. The professor reviews before anything goes live."
+        },
+        "lms": {
+          "mode": "dark",
+          "note": "No connection to Blackboard, Canvas, or any LMS. The desk drafts; the professor pastes."
+        },
+        "grading": {
+          "mode": "dark",
+          "note": "Student work and grades are protected records (FERPA). This desk prepares rubrics and feedback templates only; it never reads or scores student submissions."
+        },
+        "email": {
+          "mode": "draft"
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "Teaching material carries the professor's name and their students' trust."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/education/{run_id}/"
+      }
+    },
+    {
+      "id": "sales",
+      "display_name": "Grants & Funding",
+      "dept_dir": "departments/sales/",
+      "reports_to": "dean",
+      "shape": "pipeline",
+      "state_file": "departments/sales/grant-pipeline.md",
+      "state_stale_after_days": 7,
+      "stages": [
+        "idea",
+        "synopsis",
+        "colleague_review",
+        "outsider_read",
+        "submitted",
+        "funded",
+        "declined",
+        "dormant"
+      ],
+      "stage_aging_alert_days": 14,
+      "cadence": [
+        {
+          "task": "weekly-grant-review",
+          "cron": "0 16 * * 5",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "ages every proposal, flags stalls past stage_aging_alert_days, surfaces upcoming funder deadlines and the week's next actions"
+        }
+      ],
+      "gates": {
+        "submission": {
+          "mode": "dark",
+          "note": "A proposal is submitted by the professor through the funder's own portal. This desk never submits."
+        },
+        "reviewer_email": {
+          "mode": "draft",
+          "note": "Requests to colleagues or outside readers are drafts the professor sends by hand."
+        },
+        "budget": {
+          "mode": "owner_batch_gate",
+          "note": "No cadence run may set or change a budget figure."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "A proposal carries the professor's reputation with a funder. Draft-first is strictest here."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/sales/{run_id}/"
+      }
+    },
+    {
+      "id": "operations",
+      "display_name": "Committee & Admin",
+      "dept_dir": "departments/operations/",
+      "reports_to": "dean",
+      "shape": "calendar",
+      "state_file": "departments/operations/admin-calendar.md",
+      "state_stale_after_days": 8,
+      "cadence": [
+        {
+          "task": "weekly-admin-scan",
+          "cron": "0 8 * * 1",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "lists the week's committee meetings, review deadlines, and recurring admin that needs prep"
+        }
+      ],
+      "gates": {
+        "email": {
+          "mode": "draft",
+          "note": "Every reply is a draft the professor sends by hand."
+        },
+        "calendar": {
+          "mode": "draft"
+        },
+        "lms": {
+          "mode": "dark",
+          "note": "No LMS connection. The desk drafts; the professor pastes."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "Committee and department email speaks for the professor to colleagues. Nothing sends itself."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/operations/{run_id}/"
+      }
+    },
+    {
+      "id": "people",
+      "display_name": "Mentoring",
+      "dept_dir": "departments/people/",
+      "reports_to": "dean",
+      "shape": "roster",
+      "state_file": "departments/people/mentee-roster.md",
+      "state_stale_after_days": 14,
+      "cadence": [
+        {
+          "task": "mentoring-pulse",
+          "cron": "0 8 * * 1",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "updates who was met recently, who has gone quiet, and who has a milestone or letter due"
+        }
+      ],
+      "gates": {
+        "email": {
+          "mode": "draft"
+        },
+        "recommendation_letter": {
+          "mode": "draft",
+          "note": "Letters are drafted from the professor's own notes and always signed and sent by the professor."
+        },
+        "student_records": {
+          "mode": "dark",
+          "note": "Grades and protected student records stay out of the roster. Notes are the professor's own observations."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "Mentoring is a personal relationship. The desk remembers; the professor speaks."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/people/{run_id}/"
+      }
+    }
+  ],
+  "_managers_notes": [
+    "DEFAULTS ONLY. A local {dept}/manager.json OVERRIDES this entry wholesale. Pack declares, owner disposes.",
+    "Department ids reuse the closed kernel enum by relabel: education = Class Prep & Grading, sales = Grants & Funding (a grant is a pipeline), operations = Committee & Admin, people = Mentoring. No kernel edit.",
+    "Research has no department. It is the cross-cutting Strategy & Research team (Atlas): scan, brief, and the council's contrarian and outsider passes.",
+    "Every cadence ships enabled:false and every gate ships draft or darker. LMS and grading are dark on purpose: institutional systems and student records are out of scope for this pack."
+  ],
+  "wiki_taxonomy": [
+    {
+      "category": "people",
+      "what": "One page per student, mentee, collaborator, or program officer. Context, history, what was discussed, what is owed. Never grades or protected records."
+    },
+    {
+      "category": "concepts",
+      "what": "The professor's own frameworks, methods, arguments, and teaching approaches. Their intellectual work."
+    },
+    {
+      "category": "courses",
+      "what": "One page per course as taught. Description, level, what worked, what changed term to term."
+    },
+    {
+      "category": "grants",
+      "what": "One page per proposal or funder. Idea history, reviewer feedback, outcome, what to reuse next time."
+    },
+    {
+      "category": "literature",
+      "what": "Reading notes and summaries of papers and abstracts, with the citation. Feeds research and grant ideas."
+    },
+    {
+      "category": "decisions",
+      "what": "Major calls and their rationale - research direction, course redesigns, which grants to chase or drop."
+    },
+    {
+      "category": "operations",
+      "what": "How recurring work gets done - committee cycles, review procedures, term setup checklists."
+    },
+    {
+      "category": "projects",
+      "what": "Multi-session initiatives with history - a study, a paper, a course build, a lab setup."
+    },
+    {
+      "category": "outputs",
+      "what": "Significant one-time analyses worth preserving - literature scans, reviews written, audits."
+    },
+    {
+      "category": "departments",
+      "what": "One rolling page per department. Purpose, active work, observed patterns. Updated in place, never duplicated."
+    }
+  ],
+  "_wiki_taxonomy_notes": [
+    "This list is FIXED at runtime. The agent picks one of these per page and never invents a category.",
+    "Precedence when two fit: decisions > concepts; grants > projects (once there is a proposal, the grant page is canonical); courses > projects; operations > projects."
+  ],
+  "domain_skills": [],
+  "shared_skills": [
+    "class-manager",
+    "course-builder",
+    "lesson-planner",
+    "student-comms"
+  ],
+  "hires": [],
+  "_notes": [
+    "The active pack is the single home of niche identity. Kernel skills read these strings at runtime.",
+    "domain_skills is empty until grant-pipeline and the rubric-grading stub land (task item 7).",
+    "OPEN GAP: class-manager, course-builder, lesson-planner and student-comms are tagged 'pack: education', so a professor build drops them. This pack needs them. Needs an additive borrow mechanism in build_niche.py before a professor build is cut."
+  ]
+}

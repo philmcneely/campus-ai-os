@@ -9,7 +9,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-20BF55?style=flat-square" alt="License: MIT"/></a>
   <img src="https://img.shields.io/badge/Claude-Desktop%20%C2%B7%20Cowork%20%C2%B7%20Code-0B4F6C?style=flat-square" alt="Claude compatible"/>
   <img src="https://img.shields.io/badge/Codex-compatible-0B4F6C?style=flat-square" alt="Codex compatible"/>
-  <img src="https://img.shields.io/badge/kernel%20fixtures-226%20passing-20BF55?style=flat-square" alt="226 fixtures"/>
+  <img src="https://img.shields.io/badge/kernel%20fixtures-251%20passing-20BF55?style=flat-square" alt="251 fixtures"/>
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
 **An AI staff that remembers your business. One folder. One chief of staff. A team you can use from Claude or Codex.**
 
 <p align="center">
-  <a href="https://github.com/trainingsites/campus-ai-os/releases/latest/download/campus-ai-os-v5.2.9.plugin"><strong>⬇️ Download the plugin (one file, free)</strong></a>
+  <a href="https://github.com/trainingsites/campus-ai-os/releases/latest/download/campus-ai-os-v5.2.11.plugin"><strong>⬇️ Download the plugin (one file, free)</strong></a>
   &nbsp;·&nbsp;
   <a href="https://trainingsites.io/os"><strong>🎓 Get the free guided setup at TrainingSites.io</strong></a>
 </p>
@@ -93,7 +93,7 @@ Honest note: the founding interview takes real attention, and the first run will
 
 ### Claude Desktop or Cowork (no terminal)
 
-Download `campus-ai-os-v5.2.9.plugin` from the [latest release](https://github.com/trainingsites/campus-ai-os/releases/latest), then install it from **Settings → Plugins → Install from file**.
+Download `campus-ai-os-v5.2.11.plugin` from the [latest release](https://github.com/trainingsites/campus-ai-os/releases/latest), then install it from **Settings → Plugins → Install from file**.
 
 ### Developer paths
 
@@ -157,9 +157,9 @@ Departments provide ownership. Playbooks provide sequence and verification. Skil
 
 ---
 
-## What is new in v5.2.9
+## What is new in v5.2.11
 
-One campus is now safe to use from several AI applications on the same computer. Claude Desktop, Claude Code and Codex can each finish work in place; one configured client owns schedules and the shared ledger, and unknown clients stay contained. 226 automated fixtures back the release. Full detail in [CHANGELOG.md](CHANGELOG.md); the security work from 5.2.6 through 5.2.8 is summarised in [SECURITY.md](SECURITY.md).
+One campus is safe to use from several AI applications on the same computer. Claude Desktop, Claude Code and Codex can each finish work in place; one configured client owns schedules and the shared ledger, and every other client writes only to its own log. 5.2.11 fixes the last instructions that still told those other clients to write to the shared ledger. 251 automated fixtures back the release. Full detail in [CHANGELOG.md](CHANGELOG.md); the security work from 5.2.6 through 5.2.8 is summarised in [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -170,9 +170,9 @@ One campus is now safe to use from several AI applications on the same computer.
 | Skills | 43 | Onboarding, memory, planning, content, teaching, marketing, sales, community, and workforce governance |
 | Commands | 36 | Simple entry points such as `/morning-brief`, `/weekly-review`, and `/campus-doctor` |
 | Playbooks | 2 | Weekly Reset and One Recording to a Week of Content, plus the runtime that executes them |
-| Niche packs | 1 | The education pack for educators, coaches, course creators, and consultants |
+| Niche packs | 2 | The education pack (default) for educators, coaches, course creators, and consultants, and a professor pack. The active pack (`packs/active.json`, its `identity.business_noun`) sets what kind of business your staff talks about |
 | Tools | 20 | Packaging, validation, health evidence, seat resolution, contracts, and workspace checks |
-| Tests | 226 | Automated fixtures that protect installation, upgrades, security boundaries, and multi-client operation |
+| Tests | 251 | Automated fixtures that protect installation, upgrades, security boundaries, and multi-client operation |
 
 ### Useful commands
 

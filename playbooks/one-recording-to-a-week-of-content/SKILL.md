@@ -111,7 +111,7 @@ playbook:
 - **Stage 3 — announcement-email** (full): run `email-sequence` for a single announcement email pointing at the core piece. Check: one CTA + subject + link; draft-only.
 - **Stage 4 — social-posts** (light): run `social-planner` for 3 platform-native posts on the week's theme. Check: 3 distinct, single-idea, hooked posts.
 - **Stage 5 — community-post** (light): run `community-pulse` for one discussion starter. Check: ends in an open question, ties to the core message.
-- **Stage 6 — package-and-ledger** (light): Dean writes `results.json` (interop 1.0 shape in `README.md`) and appends one line per generative stage to `dean/.activity.jsonl`, each carrying `run_id`, `tier_requested`, `tier_used`.
+- **Stage 6 — package-and-ledger** (light): Dean writes `results.json` (interop 1.0 shape in `README.md`) and appends one line per generative stage to the ledger its seat resolves to (`.campus-os/ledger-paths.md`), each carrying `run_id`, `tier_requested`, `tier_used`.
 
 **4. Stop condition + gate.** When the 5 drafts + `results.json` + ledger lines exist, STOP. Present the week of drafts to the owner for review. Publish nothing — no stage here carries a publish grant.
 

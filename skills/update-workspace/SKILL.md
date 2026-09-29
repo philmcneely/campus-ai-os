@@ -5,7 +5,7 @@ description: >
   installed version, keeping everything the owner wrote intact. Use when the
   owner says "/update-workspace", "upgrade my campus", "update my campus", or
   when an older campus is detected.
-version: 5.2.9
+version: 5.2.11
 department: kernel
 ---
 

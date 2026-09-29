@@ -356,7 +356,12 @@ def main():
         print("no registry at", REG); sys.exit(1)
     reg = json.load(open(REG))
     teams = reg.get("teams", [])
+    # 5.2.10: the default is the ACTIVE pack (packs/active.json), not a literal.
     pack = "education"
+    try:
+        pack = json.load(open(os.path.join(ROOT, "packs", "active.json"), encoding="utf-8")).get("active_pack") or pack
+    except (OSError, ValueError):
+        pass
     if "--pack" in sys.argv:
         pack = sys.argv[sys.argv.index("--pack") + 1]
     labels = resolve_labels(os.path.join(ROOT, "packs", pack, "pack.json"))

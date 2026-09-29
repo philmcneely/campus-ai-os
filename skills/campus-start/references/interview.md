@@ -3,7 +3,7 @@
 Companion to `/campus-start` Steps 0-1b and 3. Say these in your own words
 where the skill says so, but hit every beat; the quoted blocks are the
 default wording. Every niche-flavored string comes from the active pack's
-`identity` block (`packs/education/pack.json`), never from this file.
+`identity` block (`packs/{ACTIVE_PACK}/pack.json`, resolved by the skill from `packs/active.json`), never from this file. Quoted defaults below are the education pack's.
 
 ## Step 0 - the founding frame (pack `founding_frame`; education default)
 

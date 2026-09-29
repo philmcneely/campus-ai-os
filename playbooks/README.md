@@ -31,7 +31,7 @@ A playbook is registered in `.campus-os/registry.json` → `playbooks[]` so Dean
 4. **Run the stages in order.** For each stage: resolve its model tier (see below), run the named skill/employee, capture the output into the run dir, then run the stage's `done_check`. A generative stage does not hand off until its done-check passes. Loop up to `cost_cap.max_passes`; if it still fails, take the stage's `fail_action` (default: escalate to the nearest human gate — never ship slop, never silently halt).
 5. **Respect the cost cap.** Stop the run if `max_passes` or `max_minutes` is exceeded across the run; escalate to the owner.
 6. **Stop at human gates.** Draft-only is the floor. A stage may publish only if the playbook grants it that stage explicitly *and* the owner approved the design — pull a stage out of its approved playbook and it falls back to draft.
-7. **Write `results.json` + ledger lines.** Interop schema (below) to the run dir; one activity-ledger line per stage to `dean/.activity.jsonl`, each carrying `run_id`, `tier_requested`, `tier_used`.
+7. **Write `results.json` + ledger lines.** Interop schema (below) to the run dir; one activity-ledger line per stage to the ledger your seat resolves to (`.campus-os/ledger-paths.md`; the shared `dean/.activity.jsonl` only for the clock owner), each carrying `run_id`, `tier_requested`, `tier_used`.
 
 ---
 

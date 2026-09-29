@@ -3,10 +3,10 @@ name: campus-start
 description: >
   Found a new AI-native business campus in about 5 minutes: hire-an-AI-staff
   frame, renamable chief of staff, four questions one at a time, a workspace
-  built to match; niche framing from the active pack (Education). Use when
+  built to match; niche framing from the active pack. Use when
   the owner says "/campus-start", "set up my campus", "found my campus", or
   when no campus exists.
-version: 5.2.9
+version: 5.2.11
 department: kernel
 ---
 
@@ -21,8 +21,8 @@ A founding moment, not a software install. Scripts and detail:
 **Version resolution (second):** `OS_VERSION` = `PLUGIN_MANIFEST` ->
 `version`. **Never write a hardcoded version literal.**
 
-**Pack resolution (third):** `packs/education/pack.json` -> `identity`
-supplies every niche string; never hardcode them here.
+**Pack resolution (third):** `ACTIVE_PACK` = `packs/active.json` -> `active_pack`; then `packs/{ACTIVE_PACK}/pack.json` -> `identity`
+supplies every niche string; never hardcode a pack name or its strings here.
 
 ## Guard - never scaffold over an existing campus
 

@@ -1,8 +1,8 @@
-# Campus AI OS v4.1  -  Quickstart
+# Campus AI OS  -  Quickstart
 
-**What this is:** the kernel of your AI-staffed education business. A small,
+**What this is:** the kernel of your AI-staffed business - the kind of business is set by the active niche pack (`packs/active.json` names it; its `identity.business_noun` is the word the campus uses, "education business" in the default pack). A small,
 safe chief of staff (Dean), a team directory, and an onboarding that gets you
-real work in about 10 minutes - a founding, not a form.
+real work in about 10 minutes - a founding, not a form. Your installed version is in the plugin manifest and `workspace.json`.
 
 ## Install (once)
 

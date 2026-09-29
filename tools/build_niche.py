@@ -7,7 +7,7 @@ The v5 kernel is niche-agnostic; all niche identity lives in packs/{name}/
   --check              validate the active pack against the source tree (gate)
   --list               list finding codes and titles
   --only CODE[,CODE]    run selected checks
-  --pack NAME          which pack to operate on (default: education)
+  --pack NAME          which pack to operate on (default: packs/active.json -> active_pack)
   --assemble OUT_DIR   build a variant source tree for the named pack: copy the
                        kernel, keep only that pack's domain skills + folder,
                        drop every other pack. For the shipped pack this is an
@@ -224,6 +224,20 @@ def context_canon():
     return canon_names, errors
 
 
+def active_pack():
+    """The pack this source tree is built for: packs/active.json -> active_pack (5.2.10).
+
+    One pointer, read by campus-start, the wiki skills, the label generator and
+    this gate. `assemble` rewrites it, so a niche build names its own pack and no
+    skill ever spells a pack folder.
+    """
+    p = SRC / "packs" / "active.json"
+    try:
+        return json.loads(p.read_text(encoding="utf-8")).get("active_pack")
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
 def check_manifest_shape(pack_name, pack, warnings):
     """Manifest shape."""
     errors = []
@@ -265,6 +279,9 @@ def check_orphan_pack_skills(pack_name, pack, warnings):
             pj, _ = load_pack(pdir.name)
             if pj:
                 all_declared.update(pj.get("domain_skills", []))
+                # 5.2.10: a borrowed skill keeps its owner's tag; in an assembled
+                # tree the owner pack is gone, so the borrower's declaration counts.
+                all_declared.update(pj.get("shared_skills", []))
     for sk in sorted((SRC / "skills").iterdir()):
         f = sk / "SKILL.md"
         if f.exists():
@@ -1558,7 +1575,22 @@ def check_department_label_parity(pack_name, pack, warnings):
             import importlib
             gde = importlib.import_module("gen_department_entries")
             importlib.reload(gde)
-            want = gde.resolve_labels(str(SRC / "packs" / pack_name / "pack.json"))
+            # 5.2.10: templates/registry.json is ONE derived file and it belongs to
+            # the ACTIVE pack. Comparing it against any other in-tree pack reported
+            # drift that was not drift (the Professor pack failed here by design).
+            # A non-active pack gets its registry template derived at assemble time
+            # by this same generator, so there is still no second stored copy.
+            owner_pack = active_pack() or pack_name
+            want = gde.resolve_labels(str(SRC / "packs" / owner_pack / "pack.json"))
+            if pack_name != owner_pack:
+                known = set(gde.KERNEL_LABEL)
+                for m in pack.get("managers") or []:
+                    if m.get("display_name") and m.get("id") not in known:
+                        errors.append(
+                            f"manager {m.get('id')!r} carries display_name "
+                            f"{m.get('display_name')!r} but is not a kernel department id - "
+                            f"resolve_labels() would drop the label silently"
+                        )
             have = {t["team"]: t.get("label")
                     for t in json.loads((SRC / "templates" / "registry.json")
                                         .read_text(encoding="utf-8")).get("teams", [])
@@ -1572,6 +1604,105 @@ def check_department_label_parity(pack_name, pack, warnings):
                 )
         except Exception as e:                                   # noqa: BLE001
             errors.append(f"check 24 parity could not run: {e}")
+    return errors
+
+
+def check_active_pack_pointer(pack_name, pack, warnings):
+    """Active pack pointer."""
+    errors = []
+    # 25. One pointer names the active pack; no skill spells a pack folder (5.2.10).
+    #     campus-start and its interview hardcoded `packs/education/pack.json`, so a
+    #     second pack could be built but never founded (v5 red-team finding 6).
+    name = active_pack()
+    if not name:
+        errors.append("packs/active.json missing or has no `active_pack`")
+    elif not (SRC / "packs" / name / "pack.json").is_file():
+        errors.append(f"packs/active.json names {name!r} but packs/{name}/pack.json does not exist")
+    names = sorted(d.name for d in (SRC / "packs").iterdir() if d.is_dir())
+    pat = re.compile(r"packs/(" + "|".join(map(re.escape, names)) + r")/pack\.json") if names else None
+    for root in ("skills", "commands", "references", "playbooks"):
+        base = SRC / root
+        if not pat or not base.is_dir():
+            continue
+        for f in sorted(base.rglob("*.md")):
+            for n, line in enumerate(f.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+                if pat.search(line):
+                    errors.append(
+                        f"{f.relative_to(SRC)}:{n} hardcodes a pack folder - read "
+                        f"`packs/active.json` -> `active_pack` instead"
+                    )
+    return errors
+
+
+def pack_tag_owners():
+    owners = {}
+    for pdir in (SRC / "packs").iterdir():
+        if pdir.is_dir():
+            pj, _ = load_pack(pdir.name)
+            for skill in (pj or {}).get("domain_skills", []):
+                owners[skill] = pdir.name
+    return owners
+
+
+def check_shared_skills(pack_name, pack, warnings):
+    """Shared skills."""
+    errors = []
+    # 26. `shared_skills[]` - a pack borrows another pack's domain skill (5.2.10).
+    #     `assemble` drops every other pack's domain skills; the Professor pack
+    #     reuses education-tagged ones and lost them. Optional and additive: a
+    #     pack without the key behaves exactly as before.
+    shared = pack.get("shared_skills", [])
+    if not isinstance(shared, list) or any(not isinstance(x, str) for x in shared):
+        return ["shared_skills must be a list of skill folder names"]
+    owners = pack_tag_owners()
+    for skill in shared:
+        sk = SRC / "skills" / skill / "SKILL.md"
+        if skill in pack.get("domain_skills", []):
+            errors.append(f"shared_skills: {skill!r} is already this pack's own domain skill")
+        elif not sk.is_file():
+            errors.append(f"shared_skills: skills/{skill}/SKILL.md does not exist")
+        elif owners.get(skill) and owners[skill] != frontmatter(sk).get("pack"):
+            errors.append(f"shared_skills: {skill!r} is declared by pack {owners[skill]!r} but tagged {frontmatter(sk).get('pack')!r}")
+        elif not frontmatter(sk).get("pack"):
+            # Ownership is the skill's own `pack:` tag, so this still resolves in an
+            # assembled tree where the owning pack's folder has been removed.
+            errors.append(f"shared_skills: {skill!r} is a kernel skill (no pack owns it) - it ships anyway, remove it")
+    if len(shared) != len(set(shared)):
+        errors.append("shared_skills lists a skill twice")
+    return errors
+
+
+HIRE_REQUIRED = ("hire", "repo", "pin", "license", "permission")
+
+
+def check_pack_hires(pack_name, pack, warnings):
+    """Pack hires."""
+    errors = []
+    # 27. `hires[]` - a pack may ship pre-vetted hire manifests (5.2.10, key only).
+    #     Shape mirrors .campus-os/hires/*.json. Routing to a hire waits on the hire
+    #     registry resolver; until then this gate only keeps the data honest:
+    #     pinned to a full commit, licensed, and never above the draft-only floor.
+    hires = pack.get("hires", [])
+    if not isinstance(hires, list):
+        return ["hires must be a list of hire manifests"]
+    seen = set()
+    for i, h in enumerate(hires):
+        if not isinstance(h, dict):
+            errors.append(f"hires[{i}] is not an object")
+            continue
+        hid = h.get("hire", f"#{i}")
+        for key in HIRE_REQUIRED:
+            if not h.get(key):
+                errors.append(f"hires[{hid}] missing `{key}`")
+        if h.get("pin") and not re.fullmatch(r"[0-9a-f]{40}", str(h["pin"])):
+            errors.append(f"hires[{hid}] pin must be a full 40-character commit sha, not a branch or tag")
+        if h.get("repo") and not str(h["repo"]).startswith("https://"):
+            errors.append(f"hires[{hid}] repo must be an https URL")
+        if h.get("permission") and h["permission"] != "draft-only":
+            errors.append(f"hires[{hid}] permission {h['permission']!r} - a shipped hire never exceeds draft-only")
+        if hid in seen:
+            errors.append(f"hires[{hid}] declared twice")
+        seen.add(hid)
     return errors
 
 
@@ -1612,6 +1743,9 @@ CHECKS = (
     ("NICHE-022", "Founding departments", check_founding_departments),
     ("NICHE-023", "Founding owner conversation", check_founding_owner_conversation),
     ("NICHE-024", "Department label parity", check_department_label_parity),
+    ("NICHE-025", "Active pack pointer", check_active_pack_pointer),
+    ("NICHE-026", "Shared skills", check_shared_skills),
+    ("NICHE-027", "Pack hires", check_pack_hires),
 )
 
 
@@ -1633,7 +1767,7 @@ def assemble(pack_name: str, out_dir: Path) -> list:
     if errors:
         return errors
     pack, _ = load_pack(pack_name)
-    keep = set(pack.get("domain_skills", []))
+    keep = set(pack.get("domain_skills", [])) | set(pack.get("shared_skills", []))
     drop = set()
     for pdir in (SRC / "packs").iterdir():
         if pdir.is_dir() and pdir.name != pack_name:
@@ -1653,13 +1787,22 @@ def assemble(pack_name: str, out_dir: Path) -> list:
                 shutil.rmtree(sub)
             elif sub.exists():
                 sub.unlink()
-    print(f"assembled {pack_name} -> {out_dir} (kept {len(keep)} domain skills, dropped {len(drop)})")
+    # The assembled tree IS this pack's build: point it at itself, then derive its
+    # registry template with the tree's own generator (labels from this pack,
+    # rosters from the skills that survived the drop). Nothing is stored twice.
+    (out_dir / "packs" / "active.json").write_text(
+        json.dumps({"active_pack": pack_name}, indent=2) + "\n", encoding="utf-8")
+    gen = subprocess.run([sys.executable, str(out_dir / "tools" / "gen_department_entries.py"),
+                          "--pack", pack_name], capture_output=True, text=True)
+    if gen.returncode != 0:
+        return [f"registry template derivation failed in {out_dir}: {(gen.stdout + gen.stderr).strip()[-400:]}"]
+    print(f"assembled {pack_name} -> {out_dir} (kept {len(keep)} domain + shared skills, dropped {len(drop)})")
     return []
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--pack", default="education")
+    ap.add_argument("--pack", default=active_pack() or "education")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--assemble", metavar="OUT_DIR")
     ap.add_argument("--sync-manifests", action="store_true",

@@ -40,7 +40,7 @@ The key difference: every claim references a wiki page. The owner can see exactl
 
 What is the owner actually asking about? Be specific:
 
-The wiki's categories are declared by the active pack in `packs/{active_pack}/pack.json` → `wiki_taxonomy`. Read that list first so you search the folders this campus actually has. Examples, assuming a pack that declares them:
+The wiki's categories are declared by the active pack in `packs/{active_pack}/pack.json` → `wiki_taxonomy` (`active_pack` is named in `packs/active.json`). Read that list first so you search the folders this campus actually has. Examples, assuming a pack that declares them:
 
 - "What do I know about Sarah?" → topic is a specific client (look in `clients/`)
 - "What's my framework for pricing?" → topic is a concept (look in `concepts/`)

@@ -26,8 +26,8 @@ The self-authoring loop. Watches what the owner repeatedly asks Dean to do witho
 
 - **The campus activity ledger(s)** - resolve through `LEDGER_CANON`
   (`.campus-os/ledger-paths.md` on the campus, else `templates/ledger-paths.md`
-  in this plugin). The primary seat's ledger is `dean/.activity.jsonl`; each
-  satellite seat appends its own `dean/.activity.{seat}.jsonl`. **Read them
+  in this plugin). The clock-owner seat's ledger is `dean/.activity.jsonl`; each
+  other seat appends its own `dean/.activity.{seat}.jsonl`. **Read them
   all.** Dean and the department managers append at session end.
 - `.campus-os/registry.json` - the team directory (installed teams + previously authored skills, so we don't propose duplicates)
 - `dean/skill-candidates/_rejected/*.md` - previously rejected candidates (suppression list)

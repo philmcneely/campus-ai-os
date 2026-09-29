@@ -7,7 +7,7 @@ description: >
   lanes, seat stamps, sync hazards). Reads one deterministic evidence command.
   Use when the owner says "/campus-doctor", "health check",
   "something's not working", or "is everything ok".
-version: 5.2.9
+version: 5.2.11
 department: kernel
 ---
 

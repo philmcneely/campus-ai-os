@@ -18,8 +18,8 @@ But clients write in **isolated lanes** — never the same file at the same time
    client's lane (`active-work/lanes/*`) and never into files another client
    may hold open.
 2. **Shared-memory writes are append-or-propose.** You may APPEND to
-   `dean/.activity.jsonl` (one JSON line per completed workflow — same schema
-   as dean/CLAUDE.md). For `dean/memory.md`, `dean/TASKS.md`, and `wiki/`,
+   the ledger file `.campus-os/resolve-seat.py --client codex` returns for this seat, and to no other ledger (one JSON line per completed workflow — same schema
+   as dean/CLAUDE.md). Only the clock-owner client appends to `dean/.activity.jsonl`. For `dean/memory.md`, `dean/TASKS.md`, and `wiki/`,
    write a proposal file to your lane (`memory-update-{date}.md`) instead of
    editing in place; the owner's primary client merges it at its next session
    end. This prevents two clients rewriting the same memory concurrently.
