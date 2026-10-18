@@ -77,8 +77,8 @@ entries are never renamed. Nothing to register -> show nothing here.
 
 ## Connections (old 8b) - always shown, opportunity line
 
-Read the `connections` context RESOLVED through `CONTEXT_CANON` (canon name ->
-each legacy alias -> case-insensitive match), never a filename typed here.
+Read the `connections` context RESOLVED through `CONTEXT_CANON` (founding name ->
+canon -> each legacy alias, each also matched case-insensitively before the next), never a filename typed here.
 Report ONE line: "Connections: {N} detected (email OK, community OK ...) -
 highest-value missing: {calendar}." Pick the single highest-value missing
 connector (calendar and CRM rank high for this audience). **Name the

@@ -5,7 +5,7 @@ description: >
   installed version, keeping everything the owner wrote intact. Use when the
   owner says "/update-workspace", "upgrade my campus", "update my campus", or
   when an older campus is detected.
-version: 5.2.11
+version: 5.2.13
 department: kernel
 ---
 
@@ -40,7 +40,7 @@ marker to `OS_VERSION`:
   that marker from `baseline-items.md`.
 
 🔒 **Closing rule - every upgrade path ends the same way, no exceptions.**
-Whatever the entry point, finish with additions items 11-16 (idempotent)
+Whatever the entry point, finish with additions items 11-17 (idempotent)
 and stamp `OS_VERSION`.
 
 📌 Non-default campuses are normal: read names and folders from what exists.
@@ -66,7 +66,7 @@ never rewritten); ledger header; `shared/setup-progress.md` with the goals
 row; goals stub if absent; `dean/skill-candidates/`; item 8,
 `.campus-os/registration-block-spec.md`, now item 16.
 
-**Items 11-16 run on every path** (`additions.md`):
+**Items 11-17 run on every path** (`additions.md`):
 
 11. **v4 additions (every campus, run last).**
     a. Stamp three targets with `OS_VERSION`, resolved at runtime:
@@ -107,6 +107,12 @@ row; goals stub if absent; `dean/skill-candidates/`; item 8,
     registration spec: `python3 tools/materialize_registration_spec.py
     --campus-root {campus_root}`, `--capture-notes` first when it refuses a
     hand-edited copy.
+17. **v5.2.4 and v5.2.12 additions (every campus, additive only).** The
+    v5.2.4 seat resolver refresh (a-c), then v5.2.12: insert the outside-text
+    rule into `dean/{ENTRY_FILE}` under marker
+    `<!-- campus-os:outside-text -->` if absent (owner text never rewritten),
+    and say once that `tools/resolve_context.py` now finds the campus and its
+    context files. The 12e canon refresh already carries the new read order.
 
 ## Step 4b - Department managers
 

@@ -14,6 +14,7 @@ Campus Health  -  {date}
 [--] Voice file still default  -  Dean guesses your tone until this is filled (60 sec)
 [--] Goals file still default  -  set the one number and this week's focus (60 sec)
 [--] Tools file still default  -  tell me what runs your email + community
+[OK] Context files: one file per topic
 [OK] No stale work
 [--] Startup reads 26,400 tokens (13% of the window)  -  archive due. Heaviest: memory (18,900, mostly "Recent sessions")  -  say "show me what to archive" and I'll propose it
 [OK] 0 teams registered / 0 off-spec  -  add-on teams register themselves when installed

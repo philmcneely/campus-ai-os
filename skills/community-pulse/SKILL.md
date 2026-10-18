@@ -18,7 +18,7 @@ Kernel preamble §1 applies: `references/kernel-preamble.md`.
 1. Read the resolved `icp` context — who the community members are
 2. Read the resolved `brand` context and the resolved `voice` context — community voice
 3. Read the resolved `offers` context — current programs (informs discussion topics)
-4. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): canon → alias → case-insensitive; never hard-code a filename) — check if a community platform is connected
+4. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): founding name → canon → alias, each also matched case-insensitively before the next; never hard-code a filename) — check if a community platform is connected
 5. Check the relevant employee's `memory.md` for recent community activity
 
 ## Modes
@@ -52,7 +52,7 @@ If any member wins or milestones are noted in memory:
 
 ### Step 3: Content Share
 Share one valuable piece of content:
-- A recent output from the Content Department (blog, lesson, resource)
+- A recent output from your content or teaching staff (blog, lesson, resource) in `outputs/`
 - A relevant insight from the morning brief
 - A tip tied to a current offer or program
 

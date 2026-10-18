@@ -13,12 +13,14 @@ department: dean-office
 
 Deep audit of named competitors to surface differentiation opportunities. Feeds findings into `scoring-engine` like the scanner does.
 
+Kernel preamble §4 applies: `references/kernel-preamble.md`.
+
 ## CRITICAL DIRECTIVES
 - Tool-agnostic. Baseline (WebFetch/WebSearch) always works; Firecrawl multi-page crawls and Apify channel pulls light up only if present. Never assume a connector. Zero hardcoded paths.
 - If a page returns an empty shell, ask for a paste or skip it — never fabricate competitor data.
 
 ## Steps
-1. Get the competitor list from the resolved `icp` context (`CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): canon → alias → case-insensitive) or team-private `atlas/config/niche.md` — never hard-code `shared/icp.md`; accept ad-hoc names the user gives.
+1. Get the competitor list from the resolved `icp` context (`CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): founding name → canon → alias, each also matched case-insensitively before the next) or team-private `atlas/config/niche.md` — never hard-code `shared/icp.md`; accept ad-hoc names the user gives.
 2. For each competitor, audit recent content: themes/topics, formats, cadence, and (where visible) engagement signals — comments, view counts, reactions. Premium: multi-page crawl + channel analytics.
 3. **Answer-engine cross-check (if available):** ask what ChatGPT/Perplexity/Gemini surface for the niche — note where competitors own the AI answer and where it's open.
 4. Identify: saturated topics (avoid), under-served angles (gap), and the differentiation wedge (what the user can own that competitors don't).

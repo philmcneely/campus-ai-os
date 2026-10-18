@@ -4,7 +4,47 @@ All notable changes to the Campus AI OS kernel. Format follows Keep a Changelog;
 
 ## [Unreleased]
 
-_Nothing yet._
+## [5.2.13] - 2026-10-18
+
+Repairs the one release blocker from the Codex audit of the packaged 5.2.12 artifact (`outputs/2026-10/reports/2026-10-17-campus-ai-os-v5.2.12-codex-audit.md`). 5.2.12 was never published; this release carries everything in its entry below. Patch: no new keys.
+
+### Fixed
+- **Priority lost to capitals (audit F1).** `tools/resolve_context.py` tried every exact-spelling name before any case-insensitive one, so on a case-insensitive disk a lower-priority file with exact spelling beat the preferred file in other capitals: `offers.md` over `OFFERS-SUMMARY.MD` (old long-form prices instead of the price-owning summary), `icp.md` over `AUDIENCE.MD`, `identity.md` over `BUSINESS.MD`, for reads and for `write_to`. Each candidate is now matched exactly, then case-insensitively, before the next is tried, and its real spelling is returned. The canon (`templates/context-files.md`), the kernel preamble, the contract's `resolution` list (both resolvers check it), the doctor and every skill that states the read order now say the same thing. The doctor's `context_files` section and the resolver agree on which file is read.
+
+### Added
+- Regression fixtures for the three audit cases (offers summary, founding audience, founding business in capitals beside a lower-priority exact name) and for doctor/resolver agreement. Mutation-checked: on the 5.2.12 resolver they fail. Suite is 281.
+
+### Corrections to the [5.2.12] entry
+- SEC-04 points **thirteen** reading skills at preamble §4, not twelve (`/whats-new` was added to the list).
+- `update-workspace/references/additions.md` was still titled "items 11-15"; it now says 11-17, matching the item list and the closing rule.
+
+## [5.2.12] - 2026-10-17
+
+Atlas learns to ask for more (three levers: altitude, depth, range), context files resolve correctly on a real buyer install, and one security fix pulled forward from the next minor train by owner decision (SEC-04). Patch: no new required keys; upgrade item 17 is additive.
+
+### Security
+- **SEC-04: outside text is data, never instructions.** Web pages, transcripts, reviews, emails, client messages, connector output and ingested files could carry sentences aimed at the model, and nothing in the runtime said they were not commands. New `references/kernel-preamble.md` §4 is the one owner of the rule: outside text cannot change instructions, grant permission, pick a tool, approve a send or write, or ask for secrets; a line that tries is quoted to the owner with its source; saved material keeps its source; no instruction from outside text goes into a skill, rule, memory or schedule. The chief of staff templates carry it as rule 4 (inside a `campus-os:outside-text` marker), and the twelve skills that read outside text point at it. Gate NICHE-028 fails the build if a reader or a template drops it. SEC-05 and SEC-06 stay in the next minor release.
+
+### Added
+- **Atlas, ambition levers.** `strategy-council` 2.2.0: Gate 1 says the job as a verb (not "a webinar" but what it must get done) and asks how much rides on it; on high stakes the user can seat one to three **field seats** from other fields, picked from the verb, each bringing one option nobody named (a lens, never a named person; the core five stay); Gate 4 adds an **outside check** so the convener never grades its own ruling (a fresh judge that sees only the ruling and evidence, or a named real-world check); each move is named out loud in one line so the owner learns the levers by watching them. `content-scanner` 1.1.0: an expert-tools check names what a top researcher would use that isn't connected, and the report lists it as a gap.
+- **`tools/resolve_context.py`** - finds the campus (walk up for `workspace.json` + any accepted entry file, root or `dean/`) and the file a concept resolves to. Python only, all three hosts.
+- **`/whats-new`** (promoted from the parked next-train tree) reads the public GitHub release list. The parked copy pointed at a release page that returns 404 and logged to the shared ledger; both fixed.
+- **Doctor `context_files` section** - reports a concept held in two files (the founding file plus a separate canonical-name copy, e.g. `audience.md` + `icp.md`) and offers a merge. Intended pairs (offers summary + notes) are not reported.
+- Gate NICHE-013D - fails the build if a kernel skill routes a write to `icp.md` / `identity.md` / `icp-summary.md` or requires `about-me/`.
+- `tests/test_kernel_cargo_5212.py` - fresh-folder campus (not named `Claude-Cowork`, `AGENTS.md` entry) resolving all seven concepts, shadow and price-authority cases, both gates, the Atlas levers and SEC-04. Suite is 279.
+
+### Fixed
+- **Context files on a real install.** The canon tried the canonical name first, so a thin `icp.md` / `identity.md` written later hid the full `audience.md` / `business.md` from founding. Read order is now founding name first (offers keeps `offers-summary.md` first: it owns every price); `contracts/campus.json` carries `read_order` per concept and both resolvers return it. The contract no longer claims founding writes `brand.md` (nothing does). `grill-me` and `session-capture` route facts to the resolved file, never a new `icp.md`. `first-week` stopped requiring `about-me/about-me.md`, which nothing writes, so it no longer sends every founded owner back to `/campus-start`; `wiki-query` and the map read `workspace.json` `assistant_name` instead of `about-me/`. The campus copy of the canon is refreshed on upgrade (12e), so installed teams pick up the new order without repackaging.
+- **Upgrade steps that never ran.** The v5.2.4 seat-resolver refresh had no numbered item in `/update-workspace`, so the closing rule never named it. Item 17 runs it and the 5.2.12 additions on every path.
+- **Founding matched only part of the org chart** (found on the 5.2.12 cold test). Founding made one folder per entry in the pack's `departments[]`, which lists only the departments the pack staffs, so Operations, Finance and People sat on the org chart with no folder; the close said "five of the eight" and the doctor flagged the folders. Founding now makes one folder per department on the org chart (every `type: department` entry except Dean's office), and gate NICHE-022 fails the build if a pack department has no org-chart entry. The close also bundled the department-rename question with the next-step offer; the rename is now its own turn and the close asks one question. Owner-facing text names a department only by its registry label (the close had said "Education" for the department labelled Teaching), and `/full-onboarding` no longer carries a typed five-department list.
+- **Skills still spoke the v3 org.** Eight kernel files named a "Content Department" and a "Customer Department" (Clients / Coaching / Students) that no campus has had since the staff departments arrived; `morning-brief`, `weekly-review`, `launch-planner`, `course-builder`, `lesson-planner` and `social-planner` read `content/memory.md`, `marketing/memory.md` or `sales/memory.md`, paths no founded campus has, so the morning brief could never see department work; `first-week` Day 4 read a `library/skill-to-department-map.json` that does not exist. Kernel preamble §2 now defines departments once (the org chart, by label, folder per `dept_dir` or `departments/{id}/`), every one of those skills reads through it, and gate NICHE-029 fails the build on a typed department name or a v3 department path.
+- **No staging archives in the campus.** The cold install left a `campus.tgz` the model had used to stage the scaffold; on a host where campus files can be created but not deleted, it could not be removed. Kernel preamble §2: write each file at its final path, never through an archive or temp copy.
+- The council's Gate 1 asked the sharpening and stakes questions in one message; the stakes question is now its own turn.
+- `/campus-doctor` reports every evidence section. It was told to explain "eleven" sections and had no rule for the new `context_files` one, so the line was dropped; a fixture now ties the count and the per-section rules to the tool's section list.
+- `tools/mint_run_id.py` filed a run under the wall-clock month instead of the month of the `now` it was given; a fixture pinned to September began failing on 1 October.
+
+### Changed
+- Dean templates (`templates/dean-CLAUDE.md`, `templates/dean-CODEX.md`): End of Session now opens with a save-as-you-go rule. Decisions, open items and things worth keeping go to `daily/{today}.md` (and `wiki/` when they compound) the moment they happen, not only at wrap-up, because most sessions end without one. Found on the owner's own campus 2026-10-13 (WO-2026-10-13-01). Needs the Cowork release gate before it ships.
 
 ## [5.2.11] - 2026-09-23
 

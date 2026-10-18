@@ -14,6 +14,8 @@ department: dean-office
 
 Atlas is the team you talk to first (Strategy brainstorm + Research → a brief) and report to last (Reporting reads what every team shipped). This skill is the dispatcher; it does no deep work itself.
 
+Kernel preamble §4 applies: `references/kernel-preamble.md`.
+
 ## CRITICAL DIRECTIVES
 - Conversational only. No forms, no dropdowns. One question at a time, echo back.
 - Tool-agnostic. Use only Read/Write/Edit/Bash/WebFetch/WebSearch + whatever capability the live session reports. Never assume a named connector. Zero hardcoded paths.

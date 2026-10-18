@@ -6,7 +6,7 @@ description: >
   built to match; niche framing from the active pack. Use when
   the owner says "/campus-start", "set up my campus", "found my campus", or
   when no campus exists.
-version: 5.2.11
+version: 5.2.13
 department: kernel
 ---
 
@@ -97,11 +97,13 @@ update-workspace creates the same set (build-gate check 8). Create every
 folder, even empty; write and verify the root entry file; never
 hand-build the org.
 
-**Departments:** create **one folder per entry in the pack's `departments[]`**
-(path: `managers[].dept_dir` if declared, else `departments/{id}/`) with a
-charter stub; confirm: "Starting departments: {DEPT_LABELS} - rename or
-change any?" An unstaffed department
-still gets its folder. **Clients / Projects / Mix:** `clients/_template/`,
+**Departments:** create **one folder per department on the org chart** -
+every `type: department` entry behind `{DEPT_LABELS}`, skipping `dean-office`
+(path: `managers[].dept_dir` if a manager declares one, else
+`departments/{id}/`) with a charter stub. An unstaffed department still gets
+its folder; the folders match the org chart exactly. Then confirm, as **its
+own turn**: "Starting departments: {DEPT_LABELS} - rename or change any?"
+Wait for the answer and apply any rename before Step 3. **Clients / Projects / Mix:** `clients/_template/`,
 `projects/_template/`, or both.
 
 `workspace.json` (schema in `scaffold.md`): `assistant_name`; the `business`
@@ -113,11 +115,15 @@ regress a version marker.
 
 "{Name} here - your campus exists. Your campus is on v{OS_VERSION}." A ->
 /full-onboarding now; B -> /campus-first-win, then the setup ladder; never
-nag toward the full sit-down. No tours next.
+nag toward the full sit-down. No tours next. The close asks **exactly one
+question** (the next-step offer); the departments question was already its
+own turn in Step 2. Name departments only by their `{DEPT_LABELS}` label,
+never by folder or id (the `education` department is shown as its label).
 
 ## Rules
 
 - Grade-8 language; never "orchestrator", "scaffold", "registry", "kernel".
+- **One question per turn, through the close.** Never end a turn with two questions.
 - **NEVER BATCH THE FOUNDING QUESTIONS.** One question, one answer, then the
   next - never a form, dialog, or list. Permission-to-batch wording is
   wrong; this rule wins (campus-doctor scans this file).

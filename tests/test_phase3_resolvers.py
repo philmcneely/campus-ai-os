@@ -87,7 +87,8 @@ class CopyFixture(unittest.TestCase):
 
     def mutate_contract(self):
         changed = json.loads(self.contract.read_text())
-        changed['context_aliases']['files'][0].update(canonical='new-owner.md', aliases=['old-owner.md'])
+        changed['context_aliases']['files'][0].update(canonical='new-owner.md', aliases=['old-owner.md'],
+                                                       read_order=['new-owner.md', 'old-owner.md'])
         changed['registry_enums']['enums']['status'].append('paused')
         changed['seat']['ledger']['primary'] = 'records/owner.jsonl'
         changed['hosts']['clients']['new-host'] = {'manifest_dir': '.new-host', 'entry_file': 'ENTRY.txt'}
@@ -137,7 +138,9 @@ class PythonResolvers(CopyFixture):
                             ('Audience / ICP', 'concept')]:
             self.assertEqual(self.answer('python', 'resolve_context', [value]), {
                 'concept': audience['concept'], 'canonical': audience['canonical'], 'matched_by': mode,
-                'founding_writes': audience['founding_writes'], 'read_order': [audience['canonical'], *audience['aliases']]})
+                'founding_writes': audience['founding_writes'], 'read_order': audience['read_order']})
+        # 5.2.12: the founding name is read first, so a thin icp.md cannot shadow audience.md.
+        self.assertEqual(audience['read_order'][:2], ['audience.md', 'icp.md'])
         self.assertEqual(self.answer('python', 'resolve_context', ['brand.md'])['concept'], 'Brand')
         self.assertEqual(self.answer('python', 'resolve_context', ['unknown']), {
             'concept': None, 'canonical': None, 'matched_by': None, 'founding_writes': None, 'read_order': []})

@@ -17,8 +17,8 @@ Kernel preamble §1 applies: `references/kernel-preamble.md`.
 1. Read the resolved `brand` context and the resolved `voice` context — voice and style
 2. Read the resolved `icp` context — who you're reaching
 3. Read the resolved `offers` context — what's being sold (informs promotional content)
-4. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): canon → alias → case-insensitive; never hard-code a filename) — check what social platforms are active
-5. Check `content/memory.md` — any existing content plans or themes
+4. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): founding name → canon → alias, each also matched case-insensitively before the next; never hard-code a filename) — check what social platforms are active
+5. Check your own department's notes (kernel preamble §2: the department whose roster holds `social-planner`) — any existing content plans or themes
 
 ## Inputs
 

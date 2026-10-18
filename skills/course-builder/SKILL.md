@@ -18,7 +18,7 @@ Kernel preamble §1 applies: `references/kernel-preamble.md`.
 1. Read the resolved `icp` context — who the students are, their level
 2. Read the resolved `offers` context — existing programs (avoid overlap)
 3. Read the resolved `voice` context — teaching voice
-4. Check `content/memory.md` for any existing course context
+4. Check your own department's notes (kernel preamble §2: the department whose roster holds `course-builder`) for any existing course context
 
 ## Inputs
 

@@ -10,7 +10,7 @@ from pathlib import Path
 
 KERNEL = Path(os.environ.get("KERNEL_SRC", Path(__file__).resolve().parent.parent)).resolve()
 PREAMBLE = KERNEL / "references" / "kernel-preamble.md"
-POINTER = re.compile(r"^Kernel preamble §([123]) applies: `references/kernel-preamble\.md`\.$")
+POINTER = re.compile(r"^Kernel preamble §([1234]) applies: `references/kernel-preamble\.md`\.$")
 OLD_STARTS = ("If `workspace.json` does not exist",
               "Every file this skill writes goes inside the CAMPUS FOLDER",
               "This starter employee covers the essentials")

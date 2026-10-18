@@ -139,6 +139,9 @@ can hire whole teams into departments whenever you're ready."
   the richer context).
 - **Quick path (B):** "Want to see your staff produce its first real piece
   of work right now? Takes about 5 minutes." -> run /campus-first-win.
+- The close carries ONE question. The departments rename question is asked
+  and answered in Step 2, never repeated or bundled here. A recap of what was
+  built names departments by their registry label only.
   Afterward the setup ladder shows what's still at default; offer the full
   sit-down at the first natural moment - never a nag.
 

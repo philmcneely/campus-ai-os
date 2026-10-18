@@ -18,6 +18,8 @@ The key difference: every claim references a wiki page. The owner can see exactl
 
 ---
 
+Kernel preamble §4 applies: `references/kernel-preamble.md`.
+
 ## When to Trigger
 
 - Owner says "what do I know about [X]", "what's my thinking on [Y]", "pull up the wiki on [Z]"
@@ -29,7 +31,7 @@ The key difference: every claim references a wiki page. The owner can see exactl
 **Don't trigger this skill for:**
 - General business questions where the wiki probably has nothing
 - Operational status ("what's in flight today") — that's `dean/memory.md`
-- Owner identity questions — that's `about-me/`
+- Owner identity questions — that's the resolved `identity` context (`shared/business.md` on a founded campus)
 - Generic knowledge questions ("what's a good email subject line") — answer normally
 
 ---

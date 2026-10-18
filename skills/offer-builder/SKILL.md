@@ -17,7 +17,7 @@ Kernel preamble §1 applies: `references/kernel-preamble.md`.
 1. Read the resolved `offers` context — existing offer stack (avoid overlap, find upsell paths)
 2. Read the resolved `icp` context — who you're selling to, their pain points
 3. Read the resolved `brand` context and the resolved `voice` context — sales voice
-4. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): canon → alias → case-insensitive; never hard-code a filename) — check if a shopping cart is connected
+4. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): founding name → canon → alias, each also matched case-insensitively before the next; never hard-code a filename) — check if a shopping cart is connected
 
 ## Inputs
 

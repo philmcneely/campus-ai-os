@@ -17,8 +17,8 @@ Kernel preamble §1 applies: `references/kernel-preamble.md`.
 1. Read the resolved `offers` context — what's being launched and current offer stack
 2. Read the resolved `icp` context — who you're launching to
 3. Read the resolved `brand` context and the resolved `voice` context — voice and messaging
-4. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): canon → alias → case-insensitive; never hard-code a filename) — what platforms are available
-5. Check `marketing/memory.md` for any active campaigns
+4. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): founding name → canon → alias, each also matched case-insensitively before the next; never hard-code a filename) — what platforms are available
+5. Check the notes of the department whose roster holds `email-sequence` (kernel preamble §2) for any active campaigns
 
 ## Inputs
 
@@ -78,9 +78,10 @@ Generate or delegate:
 ### Step 4: Coordination Brief
 
 Write a brief for each department involved:
-- **Content Department** → social posts, any content assets needed (employees: content-repurposer, content-scout)
-- **Customer Department** (Clients/Coaching/Students per installed delivery type) → student/client onboarding prep
-- **Marketing Department** → owns the emails and launch execution (employees: email-sequence, social-planner, launch-planner)
+- **Content work** → social posts and content assets (employees: content-repurposer, social-planner)
+- **Onboarding the people you serve** → student/client onboarding prep (employees: student-comms, client-comms)
+- **Emails and launch execution** (employees: email-sequence, launch-planner)
+Name each department by the registry label of the roster that holds the employee (kernel preamble §2); never by a typed department name.
 
 Drop briefs in the appropriate `active-work/{department}/` folders.
 

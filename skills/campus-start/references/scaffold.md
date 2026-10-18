@@ -118,12 +118,19 @@ redirect.
 
 ## Structure-specific folders
 
-- **Departments:** one folder per entry in the pack's `departments[]`, each
-  with a charter stub. The path is the department's `managers[].dept_dir`
+- **Departments:** one folder per department on the org chart - every
+  `type: department` entry in `templates/registry.json` except `dean-office`
+  (the same entries `DEPT_LABELS` renders) - each with a charter stub. Until
+  5.2.12 this read the pack's `departments[]`, which lists only the
+  departments the pack staffs; the kernel's Operations, Finance and People
+  were on the org chart with no folder, so the founding close said "five of
+  the eight" and the doctor flagged the folders as not matching. The path is the department's `managers[].dept_dir`
   where a manager declares one (a LITERAL declared path, never built as
   `departments/{id}/` - the Manager Layer naming rule) and `departments/{id}/`
   otherwise. Never type a department list. Confirm the set in one line
-  ("Starting departments: {DEPT_LABELS} - rename or change any?"). A
+  ("Starting departments: {DEPT_LABELS} - rename or change any?") as its own
+  turn, never in the same message as the next-step offer. Owner-facing text
+  names a department only by its registry `label`. A
   department with no staff yet still gets its folder: the org chart is the
   diagnosis, and an empty department tells the owner what to hire next.
 - **Clients:** `clients/` with a `_template/` client folder (brief.md,
@@ -145,7 +152,7 @@ redirect.
 - `structure` - the filing choice (`departments` | `clients` | `projects` |
   `mix`) plus EXACTLY the matching filing key holding the folder names that
   exist, the others OMITTED: `departments` -> `"departments": [...]` (the
-  pack's ids, or the renamed set); `clients` -> `"clients": []`; `projects`
+  org chart's department ids, or the renamed set); `clients` -> `"clients": []`; `projects`
   -> `"projects": []`; `mix` -> ALWAYS `"departments": [...]` PLUS at least
   one of `"clients": []` / `"projects": []` for the dimension the owner
   actually runs. A mix that writes only `departments` is invalid. Never leave

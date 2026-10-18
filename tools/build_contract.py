@@ -98,8 +98,15 @@ def parse_context_aliases(text):
         founding = [a for a in aliases if "what founding actually writes" in alias_cell.split(f"`{a}`", 1)[1][:60]]
         if "what founding actually writes" in cols[1]:
             founding.insert(0, canon[0])
+        # 5.2.12: no founding writer = None (was: fell back to the canonical name, which made the
+        # contract claim founding writes brand.md). read_order = founding name first unless the row
+        # says "canonical wins" (offers: the summary owns every price), then canonical, then aliases.
+        writes = founding[0] if founding else None
+        canonical_wins = "canonical wins" in cols[1]
+        first = [] if (writes is None or canonical_wins or writes == canon[0]) else [writes]
+        order = first + [n for n in [canon[0], *aliases] if n not in first]
         rows.append({"concept": cols[0], "canonical": canon[0], "aliases": aliases,
-                     "founding_writes": founding[0] if founding else canon[0]})
+                     "founding_writes": writes, "canonical_wins": canonical_wins, "read_order": order})
     if len(rows) < 5:
         fail2(f"parsed only {len(rows)} context rows - table format changed; fix the parser, not the data")
     return rows
@@ -178,7 +185,7 @@ def build():
             "rule": "PLATFORM.md Facts 1-2: resolve PLUGIN_MANIFEST by probe order, derive ENTRY_FILE from the manifest dir; READ any name in entry_file_read_names, WRITE only the derived one.",
         },
         "context_aliases": {
-            "resolution": ["canonical", "legacy alias (in listed order)", "case-insensitive match"],
+            "resolution": ["founding name (unless canonical_wins)", "canonical", "legacy alias (in listed order)", "each candidate also case-insensitively, before the next"],
             "canon_file": {"campus": ".campus-os/context-files.md", "kernel": "templates/context-files.md"},
             "files": parse_context_aliases(ctx),
             "field_keys": parse_field_keys(ctx),
@@ -293,9 +300,10 @@ def render_tables(c):
     for k, v in c["hosts"]["clients"].items():
         L.append(f"| `{k}` | `{v['manifest_dir']}` | `{v['entry_file']}` | {v['seat_default_role']} |")
     L += ["", f"Manifest probe order: {' → '.join('`'+m+'`' for m in c['hosts']['manifest_candidates'])}. Entry files accepted on read: {', '.join('`'+n+'`' for n in c['hosts']['entry_file_read_names'])}.", "",
-          "## Shared-context files (owner: templates/context-files.md)", "", "| Concept | Canonical | Founding writes | Legacy aliases |", "|---|---|---|---|"]
+          "## Shared-context files (owner: templates/context-files.md)", "", "| Concept | Canonical | Founding writes | Legacy aliases | Read order |", "|---|---|---|---|---|"]
     for r in c["context_aliases"]["files"]:
-        L.append(f"| {r['concept']} | `{r['canonical']}` | `{r['founding_writes']}` | {', '.join('`'+a+'`' for a in r['aliases']) or '—'} |")
+        writes = f"`{r['founding_writes']}`" if r['founding_writes'] else "— (nothing writes it)"
+        L.append(f"| {r['concept']} | `{r['canonical']}` | {writes} | {', '.join('`'+a+'`' for a in r['aliases']) or '—'} | {' → '.join('`'+n+'`' for n in r['read_order'])} |")
     L += ["", "## Registry enums (owner: templates/registration-block-spec.md)", "", "| Field | Values |", "|---|---|"]
     for f, vals in c["registry_enums"]["enums"].items():
         L.append(f"| `{f}` | {' · '.join('`'+v+'`' for v in vals)} |")

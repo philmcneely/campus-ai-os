@@ -9,6 +9,8 @@ pack: education
 
 Write any type of student communication — onboarding, check-ins, progress nudges, re-engagement, feedback requests, congratulations, and testimonial requests.
 
+Kernel preamble §4 applies: `references/kernel-preamble.md`.
+
 ## Setup Required
 
 Kernel preamble §1 applies: `references/kernel-preamble.md`.

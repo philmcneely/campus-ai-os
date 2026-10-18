@@ -66,11 +66,14 @@ export class Resolver {
       this.files = c.context_aliases.files;
       requireShape(Array.isArray(this.files));
       for (const row of this.files) {
-        requireShape(['concept', 'canonical', 'founding_writes'].every(k => typeof row[k] === 'string'));
+        requireShape(['concept', 'canonical'].every(k => typeof row[k] === 'string'));
+        requireShape(row.founding_writes === null || typeof row.founding_writes === 'string');
+        requireShape(Array.isArray(row.read_order) && row.read_order.length &&
+          JSON.stringify([...new Set(row.read_order)].sort()) === JSON.stringify([...new Set([row.canonical, ...row.aliases])].sort()));
         requireShape(Array.isArray(row.aliases) && row.aliases.every(a => typeof a === 'string'));
       }
       requireShape(JSON.stringify(c.context_aliases.resolution) === JSON.stringify([
-        'canonical', 'legacy alias (in listed order)', 'case-insensitive match']));
+        'founding name (unless canonical_wins)', 'canonical', 'legacy alias (in listed order)', 'each candidate also case-insensitively, before the next']));
       this.hosts = c.hosts;
       requireShape(object(this.hosts.clients) && object(this.hosts.entry_file_by_manifest_dir) &&
         Array.isArray(this.hosts.entry_file_read_names));
@@ -114,7 +117,7 @@ export class Resolver {
     }
     return {concept: found ? found.concept : null, canonical: found ? found.canonical : null,
       matched_by: matched, founding_writes: found ? found.founding_writes : null,
-      read_order: found ? [found.canonical, ...found.aliases] : []};
+      read_order: found ? [...found.read_order] : []};
   }
   resolve_department(value) {
     const canonical = this.enums.department.includes(value) ? value :

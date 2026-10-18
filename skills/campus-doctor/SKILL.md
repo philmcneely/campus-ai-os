@@ -7,7 +7,7 @@ description: >
   lanes, seat stamps, sync hazards). Reads one deterministic evidence command.
   Use when the owner says "/campus-doctor", "health check",
   "something's not working", or "is everything ok".
-version: 5.2.11
+version: 5.2.13
 department: kernel
 ---
 
@@ -24,8 +24,8 @@ Presence checks accept any known entry file; a repair writes the resolved one.
 
 **Context resolution (do this first too):** resolve `CONTEXT_CANON` -
 `.campus-os/context-files.md` on the campus, else `templates/context-files.md`
-in this plugin. Resolve a context file as canon name -> each alias ->
-case-insensitive match. **Never type a `shared/*.md` filename
+in this plugin. Resolve a context file in the canon's read order (founding name ->
+canon -> aliases), each also matched case-insensitively before the next. **Never type a `shared/*.md` filename
 into a check that READS one.**
 
 ## Procedure
@@ -53,7 +53,8 @@ into a check that READS one.**
    tool itself failed** - say so, show its last stderr lines, and do not
    invent numbers.
 
-3. **Explain the eleven sections in order**, one line each. Start from each
+3. **Explain the twelve sections in order**, one line each - never fold two
+   sections into one line (5.2.12: `context_files` was merged into the stale-work line). Start from each
    section's `line`; use `detail` for the fix. Status -> prefix: `ok` ->
    `[OK]`; `opportunity` or `skipped` -> `[--]`; `needs-decision` or `error`
    -> `[!!]`. Rules per section: `evidence-sections.md`.
@@ -69,6 +70,7 @@ into a check that READS one.**
    | `seat_contract` | seat identity, foreign writes, missing stamps, sync hazards |
    | `fleet_sweep` | monthly Foundry sweep; skipped outside the window or without a Foundry |
    | `staff` | org chart: employees + campus systems + playbooks, per-department; orphans loud |
+   | `context_files` | a concept held in two files (e.g. `icp.md` beside `audience.md`); the first in read order is the one every skill reads; offer to merge, never merge unasked |
    | `stale_work` | active-work files over 14 days old |
    | `ledger` | newest entry across every ledger shard; unstamped lines |
 

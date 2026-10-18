@@ -17,7 +17,7 @@ Kernel preamble §1 applies: `references/kernel-preamble.md`.
 
 1. Read the resolved `icp` context — who the learners are, their level
 2. Read the resolved `brand` context and the resolved `voice` context — teaching voice
-3. Check `content/memory.md` for any existing curriculum context
+3. Check your own department's notes (kernel preamble §2: the department whose roster holds `lesson-planner`) for any existing curriculum context
 
 ## Inputs
 

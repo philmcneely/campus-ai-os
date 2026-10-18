@@ -10,7 +10,9 @@ A 5-day guided tour that teaches you how to work with your AI team. Each day tak
 
 ## Before Starting
 
-Confirm `/campus-start` has been completed. If `workspace.json` does not exist in the campus folder, or if `about-me/about-me.md` does not exist, tell the owner to run `/campus-start` first.
+Kernel preamble §1 applies: `references/kernel-preamble.md`.
+
+For the owner's basics, read the resolved `identity` context (`shared/business.md` on a founded campus), never `about-me/`.
 
 Read `dean/memory.md` to check if any first-week days have already been completed.
 
@@ -22,50 +24,50 @@ Read `dean/memory.md` to check if any first-week days have already been complete
 2. Review the output together — does it reflect your business accurately?
 3. If anything is off, correct it. Dean writes corrections to the right place.
 
-**Wrap-up:** "Tomorrow we'll put the Content Department to work."
+**Wrap-up:** "Tomorrow your content repurposer gets to work. Bring a piece of raw content."
 
 Log completion to `dean/memory.md`.
 
 ## Day 2: Content Repurposing
 
-**Theme:** Give the Content Department something to work with.
+**Theme:** Give your content repurposer something to work with. Name its department by the registry label of the department whose roster holds `content-repurposer` (kernel preamble §2).
 
 1. Ask the owner for a piece of raw content — a recording transcript, a blog post, a social media thread, or even a rough idea
 2. Run `content-repurposer` on it
 3. Review the output: social posts, email draft, blog version
 4. Ask: "Does this sound like you?" Adjust voice if needed by updating the resolved `voice` context
 
-**Wrap-up:** "Tomorrow the Marketing Department plans a campaign."
+**Wrap-up:** "Tomorrow your email writer drafts a sequence for one of your offers."
 
 Log completion.
 
 ## Day 3: Email Sequence
 
-**Theme:** Put the Marketing Department to work.
+**Theme:** Put your email writer (`email-sequence`) to work. Name its department by its registry label.
 
 1. Pick one of the owner's offers from the resolved `offers` context
 2. Run `email-sequence` — choose a sequence type (nurture, launch, or onboarding)
 3. Review the emails — tone, length, structure
 4. Refine as needed
 
-**Wrap-up:** "Tomorrow we exercise the customer-facing department installed for your delivery type."
+**Wrap-up:** "Tomorrow your staff works with the people you serve."
 
 Log completion.
 
-## Day 4: Your Customer Department
+## Day 4: The People You Serve
 
-**Theme:** Exercise the department configured for your delivery type. Read `library/skill-to-department-map.json` (in the plugin root) to find which customer department was installed and which employees live in it.
+**Theme:** Exercise the employees who work with your clients, students or members. Find them in `.campus-os/registry.json`: the department rosters that hold `client-comms`, `student-comms`, `session-planner` and `class-manager`. Name each department by its registry label (kernel preamble §2). Ask one question first: "Who do you work with most: clients, students, or coaching members?" Then:
 
-**If Clients Department (`clients/`) is installed:**
+**Clients:**
 1. Pick a client (real or example)
 2. Run `session-planner` to prep for a session
 3. Run `client-comms` to draft a follow-up email
 
-**If Students Department (`students/`) is installed:**
+**Students or members:**
 1. Run `student-comms` for a welcome sequence
 2. Run `community-pulse` for discussion prompts
 
-**If Coaching Department (`coaching/`) is installed:**
+**Coaching:**
 1. Run `session-planner` to prep for a coaching call
 2. Run `class-manager` to schedule and prep an upcoming session
 

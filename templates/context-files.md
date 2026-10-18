@@ -2,8 +2,10 @@
 
 **This file is the ONE owner of every shared-context filename on this campus.**
 Skills NEVER hard-code `shared/icp.md` etc. They resolve a context file through
-this canon: **canonical name → legacy alias → case-insensitive match**. An OS
-rename or case difference must not break inherit.
+this canon: **founding name → canonical name → legacy alias, each matched
+case-insensitively before the next is tried** (5.2.13; see the resolution
+algorithm below). An OS rename or case
+difference must not break inherit.
 
 ## How to find THIS file (canon resolution) — added v5.1.1
 
@@ -35,8 +37,8 @@ fix.*
 | Audience / ICP | `icp.md` | `audience.md` (**what founding actually writes** — list it first), `icp-summary.md` |
 | Brand | `brand.md` | `BRAND.md`, `brand-style.md` |
 | Voice / tone | `voice.md` (**what founding actually writes**) | `voice-profile.md`, else inside `brand.md` |
-| Goals / OKRs | `goals.md` | — |
-| Offers | `offers-summary.md` (**owns every price** — one summary, one owner) | `offers.md` (**what founding actually writes** — list it first; the long-form offer notes, never the price authority) |
+| Goals / OKRs | `goals.md` (**what founding actually writes**) | — |
+| Offers | `offers-summary.md` (**owns every price** — one summary, one owner; **canonical wins**) | `offers.md` (**what founding actually writes** — list it first; the long-form offer notes, never the price authority) |
 | Tool/connection map | `connections.md` | `tools.md` (**what founding actually writes** — list it first), `campus-connections.md`, `SYSTEMS.md` (MCP Health table) |
 
 ⚠️ **Do not "tidy" `tools.md`, `business.md`, or `audience.md` out of those
@@ -68,7 +70,39 @@ every campus the moment the plugin is installed. `setup-progress.md` is
 deliberately absent — it is setup state, not business context, and no skill
 resolves it as a concept.
 
-**Resolution algorithm (per concept):** try `{dir}/{canonical}` → each alias → case-insensitive directory match. First hit wins. Absent = "not captured yet."
+**Resolution algorithm (per concept, 5.2.13):** try `{dir}/{founding name}` →
+`{dir}/{canonical}` → each remaining alias in listed order. Each name is
+matched against the real directory listing, exact spelling first and then
+case-insensitively, **before the next name is tried**, and the file's real
+spelling is returned. First hit wins. Absent = "not captured yet." (5.2.12 ran
+all exact names before any case-insensitive one, so `offers.md` beat
+`OFFERS-SUMMARY.MD` and `icp.md` beat `AUDIENCE.MD` - priority lost to
+capitals. Codex audit F1.) The machine form
+of this order is `read_order` on each row of `contracts/campus.json`;
+`tools/resolve_context.py` applies it.
+
+- **Why founding first.** Before 5.2.12 the canonical name was tried first. A
+  team that "wrote if missing" a thin `icp.md` or `identity.md` beside the full
+  `audience.md` / `business.md` from founding then won every read, and the
+  owner's real answers were never read again. The file the owner's own setup
+  wrote is the fullest one, so it is read first.
+- **Exception: a row marked canonical wins.** Offers keeps `offers-summary.md`
+  first, because it owns every price. `offers.md` is the long-form notes.
+- **Brand has no founding name.** Nothing at founding writes a brand file, so
+  its order starts at the canonical name.
+
+**Write rule.** A skill writes into the file a concept already resolves to (on a
+founded campus, append a section there). It never creates a second name for a
+concept that already resolves. Only when nothing resolves does it create the
+founding name (or the canonical name where there is no founding name).
+
+**Campus rule (one owner for detection).** A folder is a campus when it holds
+`workspace.json` and an accepted entry file (`CLAUDE.md`, `AGENTS.md`,
+`AGENTS.override.md` or `CODEX.md`) either at the root or in `dean/`. Find it by
+walking up from the working folder. Never test for a fixed folder name such as
+`Claude-Cowork/`, and never for one entry-file name alone: the owner names the
+folder, and the entry file differs per host. `tools/resolve_context.py
+--find-campus` prints the root.
 
 ## Where the dir is (§5A.3)
 - Founded campus: `{campus_root}/shared/` — resolve `campus_root` as the directory holding `workspace.json`. Never hard-code a campus folder name; the owner chose it.

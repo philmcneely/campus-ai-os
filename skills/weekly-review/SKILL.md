@@ -23,7 +23,7 @@ Read the past 7 days of daily logs from `memory/logs/`:
 Read the resolved `goals` context for current OKRs / quarterly priorities (read BEFORE memory.md).
 Read `memory/MEMORY.md` for curated facts.
 Read `dean/memory.md` for what's in flight and waiting.
-Read each department's `memory.md` (`content/memory.md`, `marketing/memory.md`, `sales/memory.md`, and the customer department) for recent run logs.
+Read each department on the org chart (kernel preamble §2) - its folder's `memory.md` if present - for recent run logs.
 
 ### Step 2: Review Format
 
@@ -38,10 +38,8 @@ Present the review:
 - [Unexpected issues or changes]
 
 ### What Each Department Delivered
-- **Content Department:** [Summary of content work]
-- **Marketing Department:** [Summary of marketing work]
-- **Sales Department:** [Summary of sales work — offers, launches, pricing decisions]
-- **{Customer Department — Clients/Coaching/Students based on installed delivery type}:** [Summary of their work]
+- **{department label}:** [Summary of that department's work this week] (one line per department that delivered)
+- Quiet this week: {labels of the departments with nothing delivered, on one line}
 
 ### What Didn't Get Done
 - [Tasks that slipped]

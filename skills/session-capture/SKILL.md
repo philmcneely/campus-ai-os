@@ -15,6 +15,8 @@ department: kernel
 
 Turns a session into compounding, sellable context. **Two physically separate tiers** — never mix them.
 
+Kernel preamble §4 applies: `references/kernel-preamble.md`.
+
 ## CRITICAL DIRECTIVES
 - **Tier 1 = private factory; Tier 2 = servable product.** Raw logs are never registered as servable. Distilled records carry gate fields.
 - **Checkpoint Tier 1 after EVERY answer** — not only at the end. This guards long sessions against context loss.
@@ -32,7 +34,7 @@ Write BOTH, per `references/context-record-schema.md`:
 3. **Manifest.** Upsert the record's catalogue entry into `context-records/context-index.json` (create if absent). This is the future service's catalogue — keep it current.
 
 ## Routing extracted facts (offer, then confirm)
-Offer to route confirmed facts to their canonical homes (`icp.md`, `offers.md`, the manager's own entry file — resolve `ENTRY_FILE` per `PLATFORM.md`, never assume a filename — etc., per the campus orchestrator's memory routing rules) and to update any skill/doc the session exposed as thin. These are real edits to context files — **offer and wait for "yes," never auto-apply.**
+Offer to route confirmed facts to the file each concept already resolves to (`tools/resolve_context.py --concept icp`; on a founded campus that is `audience.md`, never a new `icp.md` beside it; offers to the resolved offers file; the manager's own entry file — resolve `ENTRY_FILE` per `PLATFORM.md`, never assume a filename — etc., per the campus orchestrator's memory routing rules) and to update any skill/doc the session exposed as thin. These are real edits to context files — **offer and wait for "yes," never auto-apply.**
 
 ## Re-capture
 If a record/log already exists for the slug, **extend** it: append to the Tier-1 log, refresh the wiki entry, bump `version`, update `updated`. Never start cold, never duplicate the slug.

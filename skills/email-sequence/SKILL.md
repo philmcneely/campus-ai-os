@@ -18,7 +18,7 @@ Kernel preamble §1 applies: `references/kernel-preamble.md`.
 2. Read the resolved `brand` context — communication style
 3. Read the resolved `icp` context — who's receiving these emails
 4. Read the resolved `offers` context — if the sequence promotes an offer
-5. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): canon → alias → case-insensitive; never hard-code a filename) — check if an email platform is connected
+5. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): founding name → canon → alias, each also matched case-insensitively before the next; never hard-code a filename) — check if an email platform is connected
 
 ## Inputs
 

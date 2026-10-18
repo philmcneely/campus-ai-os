@@ -74,4 +74,4 @@ Any panel with no source data **hides itself**. A campus with no Strategy & Rese
 
 ## Brand + orchestrator name
 
-The map auto-pulls the campus name, tagline, colors, and heading font from the resolved `brand` context (resolved through `CONTEXT_CANON`, which covers every spelling; neutral defaults if nothing resolves). The orchestrator name is read from `about-me/dean-name.md` if the owner renamed Dean, otherwise it shows "Dean". No configuration needed.
+The map auto-pulls the campus name, tagline, colors, and heading font from the resolved `brand` context (resolved through `CONTEXT_CANON`, which covers every spelling; neutral defaults if nothing resolves). The orchestrator name is `assistant_name` in `workspace.json` (set at founding when the owner renames Dean; the older `about-me/dean-name.md` is still read as a fallback), otherwise it shows "Dean". No configuration needed.

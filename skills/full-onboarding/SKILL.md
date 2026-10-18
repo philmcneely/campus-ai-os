@@ -58,11 +58,10 @@ this later", and move on. Never blow the ~30-minute ceiling.
      the client-facing delivery." (Word the delivery example in the active
      pack's terms - `packs/*/pack.json`; education pack: "not just the
      teaching.") (Skip whatever /campus-start already captured; don't re-ask.)
-   - **Departments always exist.** The staff org (Marketing, Sales, Community,
-     Education, and Dean's office - five `type: department` entries, plus the
-     campus-systems record) is already in `.campus-os/registry.json` from
-     founding (the template ships them with their rosters) - just confirm
-     they're present. Never hand-build or duplicate them. That's how employees
+   - **Departments always exist.** The staff org (every `type: department`
+     entry, each shown by its registry `label`, plus the campus-systems
+     record) is already in `.campus-os/registry.json` from founding (the
+     template ships them with their rosters) - just confirm they're present. Never hand-build or duplicate them. That's how employees
      are grouped, no matter the filing choice.
    - **Filing question (this is the structure question, reworded):** "How should
      finished work be filed - by department, by client, by project, or a mix?"

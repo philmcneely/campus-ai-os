@@ -21,7 +21,7 @@
 **An AI staff that remembers your business. One folder. One chief of staff. A team you can use from Claude or Codex.**
 
 <p align="center">
-  <a href="https://github.com/trainingsites/campus-ai-os/releases/latest/download/campus-ai-os-v5.2.11.plugin"><strong>⬇️ Download the plugin (one file, free)</strong></a>
+  <a href="https://github.com/trainingsites/campus-ai-os/releases/latest/download/campus-ai-os-v5.2.13.plugin"><strong>⬇️ Download the plugin (one file, free)</strong></a>
   &nbsp;·&nbsp;
   <a href="https://trainingsites.io/os"><strong>🎓 Get the free guided setup at TrainingSites.io</strong></a>
 </p>
@@ -93,7 +93,7 @@ Honest note: the founding interview takes real attention, and the first run will
 
 ### Claude Desktop or Cowork (no terminal)
 
-Download `campus-ai-os-v5.2.11.plugin` from the [latest release](https://github.com/trainingsites/campus-ai-os/releases/latest), then install it from **Settings → Plugins → Install from file**.
+Download `campus-ai-os-v5.2.13.plugin` from the [latest release](https://github.com/trainingsites/campus-ai-os/releases/latest), then install it from **Settings → Plugins → Install from file**.
 
 ### Developer paths
 
@@ -157,9 +157,14 @@ Departments provide ownership. Playbooks provide sequence and verification. Skil
 
 ---
 
-## What is new in v5.2.11
+## What is new in v5.2.13
 
-One campus is safe to use from several AI applications on the same computer. Claude Desktop, Claude Code and Codex can each finish work in place; one configured client owns schedules and the shared ledger, and every other client writes only to its own log. 5.2.11 fixes the last instructions that still told those other clients to write to the shared ledger. 251 automated fixtures back the release. Full detail in [CHANGELOG.md](CHANGELOG.md); the security work from 5.2.6 through 5.2.8 is summarised in [SECURITY.md](SECURITY.md).
+- **Atlas asks for more.** On a big decision, the strategy council says the job as a goal, asks how much rides on it, can bring in voices from other fields (a teacher, a researcher, an operator) that each add an option nobody named, and gets an outside check before you approve the call. Every move is named out loud, so you learn the levers by watching them.
+- **Outside text is data, never instructions.** Web pages, transcripts, emails and client messages can't change your AI's rules, approve a send or slip into its memory. If a page tries, your chief of staff quotes the line to you and carries on.
+- **Your setup answers are always the ones read.** Skills read the files founding wrote first, so a thinner copy written later can't hide them; your price list stays the price authority.
+- **Founding matches your org chart**, one question at a time, with your department names. **`/whats-new`** tells you when a newer release is out.
+
+281 automated fixtures back the release, and the packaged file passed an independent audit. Full detail in [CHANGELOG.md](CHANGELOG.md); security notes in [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -167,12 +172,12 @@ One campus is safe to use from several AI applications on the same computer. Cla
 
 | Component | Included | Purpose |
 |---|---:|---|
-| Skills | 43 | Onboarding, memory, planning, content, teaching, marketing, sales, community, and workforce governance |
-| Commands | 36 | Simple entry points such as `/morning-brief`, `/weekly-review`, and `/campus-doctor` |
+| Skills | 44 | Onboarding, memory, planning, content, teaching, marketing, sales, community, and workforce governance |
+| Commands | 37 | Simple entry points such as `/morning-brief`, `/weekly-review`, and `/campus-doctor` |
 | Playbooks | 2 | Weekly Reset and One Recording to a Week of Content, plus the runtime that executes them |
 | Niche packs | 2 | The education pack (default) for educators, coaches, course creators, and consultants, and a professor pack. The active pack (`packs/active.json`, its `identity.business_noun`) sets what kind of business your staff talks about |
-| Tools | 20 | Packaging, validation, health evidence, seat resolution, contracts, and workspace checks |
-| Tests | 251 | Automated fixtures that protect installation, upgrades, security boundaries, and multi-client operation |
+| Tools | 21 | Packaging, validation, health evidence, seat resolution, contracts, and workspace checks |
+| Tests | 281 | Automated fixtures that protect installation, upgrades, security boundaries, and multi-client operation |
 
 ### Useful commands
 

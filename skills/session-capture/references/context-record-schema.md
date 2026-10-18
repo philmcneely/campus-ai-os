@@ -28,10 +28,10 @@ The Tier-2 layer is the **only** surface a future MCP-gated context service expo
 
 ### Field rules
 - `id`: `ctx-` + slug + 4-char suffix (lowercase hex). Stable for the life of the record; survives version bumps.
-- `type`: drives where extracted `fields` are routed (audience→icp.md, offer→offers.md, process/decision→wiki page).
+- `type`: drives where extracted `fields` are routed (audience→the resolved `icp` file, offer→the resolved offers file, process/decision→wiki page). "Resolved" means the context-files read order: `audience.md` on a founded campus. Never create a second file for a concept that already resolves.
 - `shareable` / `gate_tier`: **written from day one** so the future MCP server can gate without a migration. **Default `private` / `internal`** for `business-knowledge` and `process` records unless the user explicitly opts in. The server returns a record only when the caller's tier clears `gate_tier` AND `shareable != private`.
 - `version`: bump on every re-capture of the same slug; `updated` follows.
-- `fields`: use the exact canonical field keys (icp.md → `primary_audience`, `pains[]`, …; offers.md → `offers[]`{name,price,promise,url_or_id}; etc.). Never invent keys.
+- `fields`: use the exact canonical field keys (icp concept → `primary_audience`, `pains[]`, …; offers concept → `offers[]`{name,price,promise,url_or_id}; etc.), whatever the file is named on disk. Never invent keys.
 
 ## `context-index.json` — the catalogue (the future service's index)
 

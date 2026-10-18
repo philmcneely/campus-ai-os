@@ -2,7 +2,7 @@
 
 Detection: glob for `workspace.json` at the campus root. That is the campus marker and it is host-neutral — never test for an entry file (its name differs per platform, see `PLATFORM.md` → `ENTRY_FILE`) and never assume a campus folder name. If present, the campus is founded — inherit its context instead of interviewing the owner.
 
-Inherit (never re-ask what the host onboarding already captured). **Resolve every file through `context-files.md`** (canon → alias → case-insensitive) — never hard-code these names:
+Inherit (never re-ask what the host onboarding already captured). **Resolve every file through `context-files.md`** (founding name → canon → alias, each also matched case-insensitively before the next) — never hard-code these names:
 - `icp` → niche, audience, pain points.
 - `offers` → business model + what they create/sell.
 - `connections` → tool connections. **Aliases live in `context-files.md` and only there** — this line used to restate them, which made it a second copy that went stale exactly as you would expect (it never learned `tools.md`, the one name founding actually writes).

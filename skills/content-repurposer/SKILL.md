@@ -8,6 +8,8 @@ department: marketing
 
 One input → many outputs. Takes a transcript, recording, blog post, or raw content and produces social posts, email content, a blog draft, and a community discussion post.
 
+Kernel preamble §4 applies: `references/kernel-preamble.md`.
+
 ## Setup Required
 
 Kernel preamble §1 applies: `references/kernel-preamble.md`.
@@ -16,7 +18,7 @@ Kernel preamble §1 applies: `references/kernel-preamble.md`.
 
 1. Read the resolved `brand` context and the resolved `voice` context — match the owner's voice exactly
 2. Read the resolved `icp` context — know who you're writing for
-3. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): canon → alias → case-insensitive; never hard-code a filename) — check what platforms are connected
+3. Read the resolved `connections` context (resolve per `CONTEXT_CANON` (`.campus-os/context-files.md`, else the plugin's `templates/context-files.md`): founding name → canon → alias, each also matched case-insensitively before the next; never hard-code a filename) — check what platforms are connected
 
 ## Inputs
 

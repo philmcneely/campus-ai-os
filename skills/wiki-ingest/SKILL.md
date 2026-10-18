@@ -18,6 +18,8 @@ The wiki follows the Karpathy LLM Wiki pattern: **synthesis happens at ingest ti
 
 ---
 
+Kernel preamble §4 applies: `references/kernel-preamble.md`.
+
 ## When to Trigger
 
 - Owner says "add this to my wiki", "remember this", "ingest this", "wiki this"

@@ -50,10 +50,13 @@ class Resolver:
             _require(isinstance(self.files, list))
             for row in self.files:
                 _require(isinstance(row['concept'], str) and isinstance(row['canonical'], str))
-                _require(isinstance(row['founding_writes'], str))
+                _require(row['founding_writes'] is None or isinstance(row['founding_writes'], str))
+                _require(isinstance(row['read_order'], list) and row['read_order'] and
+                         set(row['read_order']) == {row['canonical'], *row['aliases']})
                 _require(isinstance(row['aliases'], list) and all(isinstance(a, str) for a in row['aliases']))
             _require(c['context_aliases']['resolution'] == [
-                'canonical', 'legacy alias (in listed order)', 'case-insensitive match'])
+                'founding name (unless canonical_wins)', 'canonical',
+                'legacy alias (in listed order)', 'each candidate also case-insensitively, before the next'])
             self.hosts = c['hosts']
             _require(isinstance(self.hosts['clients'], dict))
             _require(isinstance(self.hosts['entry_file_by_manifest_dir'], dict))
@@ -105,7 +108,7 @@ class Resolver:
         return {'concept': found['concept'] if found else None,
                 'canonical': found['canonical'] if found else None, 'matched_by': matched,
                 'founding_writes': found['founding_writes'] if found else None,
-                'read_order': [found['canonical'], *found['aliases']] if found else []}
+                'read_order': list(found['read_order']) if found else []}
 
     def resolve_department(self, value):
         canonical = value if value in self.enums['department'] else self.aliases.get(value)

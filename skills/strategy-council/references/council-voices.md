@@ -34,9 +34,30 @@ No fabricated quotes, no celebrity cosplay. The heuristic is the value.
 
 **Constraints:** opt-in and gated, never auto-seated silently · **max one or two guests** per session (a scalpel, not a crowd) · favorite lenses persist in `atlas/config/niche.md`.
 
+## Field seats (optional — a crew from other fields, for high-stakes topics)
+
+The core five are marketing and business roles. On an important topic they share the same blind spots, so the room can't see options outside its own field. **Field seats** bring in people from *other* fields, picked from the job said as a verb at Gate 1.
+
+- **Pick from the verb, not the noun.** "A course sales page" (noun) suggests copywriters. "Helping a nervous 50-year-old picture themselves finishing the course" (verb) suggests a classroom teacher, a UX researcher, a coach who runs beginner groups.
+- **One to three seats**, only when the stakes question at Gate 1 says the topic matters. Low stakes: no field seats. Each one costs a full voice of work.
+- **The user approves each seat** before it joins, just like a guest.
+- **Each field seat brings one option nobody named** at Gate 2: the "we hadn't thought of that" move. That is its whole job. It then argues at The Table like any voice.
+- **Lens, not impersonation.** A field seat speaks as the role ("a classroom teacher would…"), never as a named real person.
+
+Field seats sit alongside the core five and any guest; they never replace a core voice, so the coverage guarantee holds.
+
+## Outside check (Gate 4)
+
+Councils agree with themselves. The convener must not be the only judge of its own ruling. Before the ratify question, get one check from outside the debate:
+
+1. **A fresh judge** (preferred when sub-agents exist): a new sub-agent that sees only the ruling, the winning argument and the evidence — not the debate or the voices — and answers: "What would prove this wrong, and how likely is it?"
+2. **A named real-world check:** the number or test that would settle it outside the room (search demand, a reply rate, a one-question poll, a test send to five buyers).
+
+Write the verdict next to the surviving dissent in `strategy-brief.md`. If they agree, say so; if the judge breaks the ruling, loop back to Gate 3.
+
 ## Council engine (v2) — sub-agents + convener, two rounds
 
-1. **Opening round (fan-out):** spin up one sub-agent per seated voice (core five + any guest) with a lens-briefing prompt + the framed idea + resolved context (audience/offers/goals/voice). Run in parallel — each produces its opening take.
+1. **Opening round (fan-out):** spin up one sub-agent per seated voice (core five + any field seats + any guest) with a lens-briefing prompt + the framed idea + resolved context (audience/offers/goals/voice). Run in parallel — each produces its opening take.
 2. **Table round:** feed every voice's opening take back to the voices; each sub-agent must produce **rebuttals to named others** (real challenges only — see the quality bar above) and may revise its own position. Cap rebuttals so the Table stays sharp: each voice challenges 1–2 others, not all four — depth over volume.
 3. **Fan-in (convener):** the convener reads the opening takes **and the rebuttals**, states the **ruling** (winning position + the argument that beat the rest + the surviving named dissent — dissent is never averaged away), and runs the Gate-4 judgment beats.
 
@@ -49,9 +70,12 @@ No fabricated quotes, no celebrity cosplay. The heuristic is the value.
 
 ## Output shape (strategy-brief.md, written only at Gate 5)
 Add `artifact_type: strategy-decision` to the frontmatter/JSON. Keep the filename `strategy-brief.md` for downstream compatibility; the content is now a decision, not a menu.
+- **The job, as a verb** — one line from Gate 1.
 - **The decision / ruling** (1–3 sentences) — the position that won.
 - **The argument that produced it** — why it beat the alternatives (from The Table).
 - **Surviving dissent** — the strongest objection that lost but still stands, named, as the risk to watch.
+- **Outside check** — who or what checked the ruling from outside the debate, and its verdict.
+- **Seats** — the core five plus any field seats and guest that sat, each with the one option a field seat added.
 - **Alternatives considered** — the 1–2 proposed paths + why not.
 - **Premortem** — the top failure mode.
 - **Research mandate** (mandate.json): `hunt_for[]`, `avoid[]`, `weight_shifts{}`.

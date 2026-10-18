@@ -16,7 +16,7 @@ from contract import Resolver, ContractError
 
 KERNEL = Path(__file__).resolve().parent.parent
 ORDER = ('workspace', 'version_lockstep', 'registry', 'context_weight', 'results_ledgers',
-         'schedules', 'seat_contract', 'fleet_sweep', 'staff', 'stale_work', 'ledger')
+         'schedules', 'seat_contract', 'fleet_sweep', 'staff', 'context_files', 'stale_work', 'ledger')
 PREFIX = {'ok': '[OK]', 'opportunity': '[--]', 'needs-decision': '[!!]', 'skipped': '[--]', 'error': '[!!]'}
 
 
@@ -251,6 +251,27 @@ class Evidence:
                        f'Your staff: {len(seen)} employees + {len(systems)} campus systems + {len(playbooks)} playbooks',
                        employees=len(seen), campus_systems=len(systems), playbooks=len(playbooks),
                        departments=rows, orphans=orphans, duplicate_memberships=duplicates)
+
+    def context_files(self):
+        """5.2.12: a concept held in two files (e.g. a thin icp.md a team wrote beside the
+        audience.md founding wrote). Reads resolve to the first in read order; the owner merges."""
+        base = self.root / 'shared'
+        if not base.is_dir():
+            return section('skipped', 'Context files check skipped: shared/ is absent', reason='directory-absent')
+        # Only the shadow pair: the file founding wrote AND a separate canonical-name copy.
+        # Offers (summary + long-form notes) and voice-inside-brand are intended pairs, not doubles.
+        actual = {e.name.lower(): e.name for e in base.iterdir() if e.is_file()}
+        doubles = []
+        for row in self.contract.files:
+            founding, canonical = row.get('founding_writes'), row['canonical']
+            if not founding or founding == canonical or row.get('canonical_wins'):
+                continue
+            if founding.lower() in actual and canonical.lower() in actual:
+                doubles.append({'concept': row['concept'], 'read': actual[founding.lower()],
+                                'also': [actual[canonical.lower()]]})
+        return section('opportunity' if doubles else 'ok',
+                       f'Context files: {len(doubles)} concept(s) held in more than one file',
+                       count=len(doubles), concepts=doubles)
 
     def stale_work(self):
         base = self.root / 'active-work'

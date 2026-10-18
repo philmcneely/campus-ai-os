@@ -21,7 +21,7 @@ python3 tools/doctor_evidence.py --campus-root {campus_root} --json
   stdin and is the ONLY way stdin is read (an open pipe with no flag never
   blocks). Relative paths are campus-relative.
 - `--sweep` forces the fleet sweep outside the monthly window.
-- JSON shape: `generated.today` plus eleven sections, each
+- JSON shape: `generated.today` plus twelve sections, each
   `{status, detail, line}`. Statuses: `ok`, `opportunity`, `needs-decision`,
   `skipped`, `error`. Without `--json` the tool prints each section's `line`
   in check order - the same lines the report shows.
@@ -40,7 +40,8 @@ python3 tools/doctor_evidence.py --campus-root {campus_root} --json
 | `workspace` | 1 (partly), 2, 2a | `seat_contract` | 11, 11a-c |
 | `version_lockstep` | 2c, 2d | `fleet_sweep` | 7c |
 | `registry` | 3, 7, 7b | `staff` | 8a |
-| `context_weight` | 5a | `stale_work` | 5 |
+| `context_weight` | 5a | `context_files` | new (5.2.12) |
+| `stale_work` | 5 | | |
 | `results_ledgers` | new (Phase 3.1) | `ledger` | 9 |
 | `schedules` | 10 | manual (see `manual-checks.md`) | 1 write test, 2b, 4, 6a, 6b, 8, 8a-i, 8b, backup line |
 
@@ -242,6 +243,19 @@ pack adds (v5.1.7), and the doctor was once the THIRD owner of the label
 (v5.1.6, "Education 3" on a campus whose registry said "Teaching"). Counts
 are never asserted from an example; a grown campus or another pack reads
 differently and that is correct. Shown in every filing mode.
+
+## `context_files` (new, 5.2.12)
+
+A concept held in two files: the file founding wrote AND a separate
+canonical-name copy (`audience.md` + `icp.md`, `business.md` + `identity.md`,
+`tools.md` + `connections.md`). Every skill reads the first one in the canon's
+read order (the founding file), so the other is silently ignored. Intended
+pairs are never reported: the offers summary plus its long-form notes, voice
+inside a brand file. `detail.concepts[]` names each pair (`read`, `also`).
+Report `[OK]` when the count is 0 ("Context files: one file per topic"); otherwise
+`[--]` with the pair in plain words ("Your audience lives in two files; I read
+the one setup wrote. Want me to merge the other into it?"). Offer the merge,
+never do it unasked.
 
 ## `stale_work` (old 5)
 

@@ -8,6 +8,8 @@ department: community
 
 Write any type of client communication — intake, session follow-ups, check-ins, re-engagement, testimonial requests, proposals, and project updates.
 
+Kernel preamble §4 applies: `references/kernel-preamble.md`.
+
 ## Setup Required
 
 Kernel preamble §1 applies: `references/kernel-preamble.md`.

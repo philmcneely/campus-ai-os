@@ -251,7 +251,7 @@ function parseBrand() {
     headingFont: 'Comfortaa', bodyFont: 'Roboto',
     fontImport: 'https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap',
   };
-  const candidates = ['brand-style.md', 'BRAND.md'];
+  const candidates = ['brand.md', 'BRAND.md', 'brand-style.md'];   // canon read order (contracts/campus.json)
   for (const file of candidates) {
     const p = path.join(ROOT, 'shared', file);
     if (!fs.existsSync(p)) continue;
@@ -282,8 +282,14 @@ function parseBrand() {
   return out;
 }
 
-// ---- orchestrator name: about-me/dean-name.md (buyer may rename "Dean") ----
+// ---- orchestrator name (buyer may rename "Dean") ----
+// 5.2.12: founding stores it as workspace.json `assistant_name`; about-me/dean-name.md is the
+// pre-5.x location, read only as a legacy fallback. Nothing in founding writes about-me/.
 function parseOrchestratorName() {
+  try {
+    const ws = JSON.parse(fs.readFileSync(path.join(ROOT, 'workspace.json'), 'utf8'));
+    if (ws && typeof ws.assistant_name === 'string' && ws.assistant_name.trim()) return ws.assistant_name.trim();
+  } catch { /* no workspace.json or unreadable: fall through to the legacy file */ }
   const p = path.join(ROOT, 'about-me', 'dean-name.md');
   if (!fs.existsSync(p)) return 'Dean';
   let raw; try { raw = fs.readFileSync(p, 'utf8'); } catch { return 'Dean'; }

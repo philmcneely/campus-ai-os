@@ -138,6 +138,15 @@ class PrivateOnlyAndBrandSinks(unittest.TestCase):
             self.assertNotIn('evil.example', html)
             self.assertIn('&lt;/title&gt;', html)
 
+    def test_assistant_name_from_workspace_wins_and_is_inert(self):
+        # 5.2.12 K5: founding stores the renamed chief of staff in workspace.json, not about-me/.
+        (self.root / 'workspace.json').write_text(json.dumps({'assistant_name': 'Ada<svg onload=alert(4)>'}))
+        html = self.build()
+        self.assertIn('"orchestrator":"Ada\\u003csvg', html)   # JSON data block, escaped
+        self.assertNotIn('<svg onload', html)
+        (self.root / 'workspace.json').write_text(json.dumps({'assistant_name': 'Ada'}))
+        self.assertIn('Ada', self.build())
+
     def test_offline_build_makes_no_network_request_and_every_build_has_csp(self):
         priv = self.build(); off = self.build('--no-remote-fonts')
         self.assertNotIn('fonts.googleapis', off)

@@ -118,7 +118,8 @@ def mint(slug: str, *, campus_root: str | Path = ".", team: str | None = None,
     if not create:
         return {"run_id": chosen, "run_dir": None}
 
-    base = run_path(campus_root, team, slug, kind=kind, standalone=standalone)
+    base = run_path(campus_root, team, slug, kind=kind, standalone=standalone,
+                    month=now.strftime("%Y-%m"))
     target = base / chosen
     if run_id:
         if target.exists():

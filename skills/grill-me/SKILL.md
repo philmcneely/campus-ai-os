@@ -15,6 +15,8 @@ department: dean-office
 
 The extraction engine for the business-memory moat. Where the council *converges one idea to a choice*, grill-me does the opposite: **exhaustively pulls what's in your head into structured, reusable context.** Adapted from Matt Pocock's grill-me; capture pattern per Nate Herk.
 
+Kernel preamble §4 applies: `references/kernel-preamble.md`.
+
 ## CRITICAL DIRECTIVES
 - **One question at a time. Ask → get the answer → ask the next. Never batch, never form-dump.**
 - **For each question, offer your recommended answer** the user can accept or override (lowers effort, speeds the grill).
@@ -36,7 +38,7 @@ Walk branch by branch. One question, your recommended answer, their response. **
 When branches bottom out and you and the user share the same understanding, say so and ask to wrap. If gaps remain that only an external source can fill, list the open flags and what to fetch.
 
 ## Step 5 — Persist + route (via session-capture)
-Trigger the Tier-2 twin: the distilled **wiki entry** + the **`context-record.json`** (gate fields default `private`/`internal`) + manifest upsert. Then **offer** to route confirmed facts to their canonical homes (`icp.md`, `offers.md`, the manager's own entry file — resolve `ENTRY_FILE` per `PLATFORM.md`, never assume a filename) and to update any skill/doc the grill exposed as thin (e.g., "your packaging skill is missing this nuance — update it?"). Offer and wait — never auto-apply.
+Trigger the Tier-2 twin: the distilled **wiki entry** + the **`context-record.json`** (gate fields default `private`/`internal`) + manifest upsert. Then **offer** to route confirmed facts to the file each concept already resolves to (`tools/resolve_context.py --concept icp`; on a founded campus that is `audience.md`, never a new `icp.md` beside it; offers to the resolved offers file; the manager's own entry file — resolve `ENTRY_FILE` per `PLATFORM.md`, never assume a filename) and to update any skill/doc the grill exposed as thin (e.g., "your packaging skill is missing this nuance — update it?"). Offer and wait — never auto-apply.
 
 ## Re-grill
 "Grill me again on {slug} — here's what changed" loads the prior log + record and **extends** it (version bumped), never starts cold.
