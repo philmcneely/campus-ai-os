@@ -6,7 +6,7 @@ description: >
   built to match; niche framing from the active pack. Use when
   the owner says "/campus-start", "set up my campus", "found my campus", or
   when no campus exists.
-version: 5.2.13
+version: 5.2.17
 department: kernel
 ---
 
@@ -90,6 +90,8 @@ shared/          business.md, voice.md, goals.md, offers.md, audience.md, tools.
 .campus-os/      registry.json, model-routing.md, context-files.md, ledger-paths.md,
                  run-id-and-interop.md, resolve-seat.py (from templates/ and tools/), .campus-os/scan/, registration-block-spec.md
                  (MATERIALIZED: tools/materialize_registration_spec.py --campus-root {root})
+.campus-os/kernel/  the kernel kit (core tier), written FIRST - the tools above run from it
+                 (`scaffold.md` -> "Kernel kit"; Kernel preamble §5)
 atlas/config/  active-work/  inputs/  outputs/  wiki/  daily/
 ```
 
@@ -134,3 +136,5 @@ never by folder or id (the `education` department is shown as its label).
 ## File anchoring (critical)
 
 Kernel preamble §2 applies: `references/kernel-preamble.md`.
+
+Kernel preamble §5 applies: `references/kernel-preamble.md`.

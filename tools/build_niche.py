@@ -51,6 +51,7 @@ CLOSING_RULE_MARKER = "Closing rule - every upgrade path ends the same way"
 SCAFFOLD_PARITY = (
     (".campus-os/scan/", "hr-registry writes its scan snapshots here"),
     ("atlas/config/", "the strategy and research team's private config lives here"),
+    (".campus-os/kernel/", "the kernel kit: every skill runs kernel tools from this campus copy"),
 )
 
 # A platform literal is permitted on a line that also carries one of these -

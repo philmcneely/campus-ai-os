@@ -7,7 +7,7 @@ description: >
   lanes, seat stamps, sync hazards). Reads one deterministic evidence command.
   Use when the owner says "/campus-doctor", "health check",
   "something's not working", or "is everything ok".
-version: 5.2.13
+version: 5.2.17
 department: kernel
 ---
 
@@ -35,12 +35,23 @@ into a check that READS one.**
    failure: "Claude can't see your campus folder. Reconnect it: [folder icon]
    in the sidebar -> choose your campus folder." A failed delete still passes.
 
-2. **Gather the evidence in one command**, run from the plugin's own `tools/`
-   directory. Read-only and byte-stable:
+2. **Gather the evidence in one command**, run from the campus kit
+   (Kernel preamble §5), from the campus root, in the shell that can see the
+   campus folder. First make sure the kit is current and has the `on_demand`
+   tier: `update-workspace/references/additions.md` item 18 steps a-c with
+   `--tier all` (copy only what is missing or changed). Read-only and
+   byte-stable:
 
    ```
-   python3 tools/doctor_evidence.py --campus-root {campus_root} --json
+   python3 -I -B .campus-os/kernel/tools/doctor_evidence.py --campus-root . --json --kit-manifest -
    ```
+
+   with the plugin's `tools/kit-manifest.json` (read with file tools) on
+   stdin: the `kernel_kit` line is then checked against the plugin, not
+   against the kit's own stamp. Run only a kit that passed §0's check first:
+   a changed or `newer` kit is never run.
+   No kit and no way to copy one, but this shell sees the plugin: run the
+   plugin's `tools/doctor_evidence.py` instead and say so.
 
    Add `--scheduled-json PATH` (or `-` with the list on stdin) when THIS host
    can list its scheduled jobs, using the envelope in `evidence-sections.md`;
@@ -53,7 +64,7 @@ into a check that READS one.**
    tool itself failed** - say so, show its last stderr lines, and do not
    invent numbers.
 
-3. **Explain the twelve sections in order**, one line each - never fold two
+3. **Explain the thirteen sections in order**, one line each - never fold two
    sections into one line (5.2.12: `context_files` was merged into the stale-work line). Start from each
    section's `line`; use `detail` for the fix. Status -> prefix: `ok` ->
    `[OK]`; `opportunity` or `skipped` -> `[--]`; `needs-decision` or `error`
@@ -62,10 +73,11 @@ into a check that READS one.**
    | Section | Meaning |
    |---|---|
    | `workspace` | `workspace.json` + root entry file present; missing -> offer /campus-start |
+   | `kernel_kit` | the campus copy of the kernel tools: present, every file checks, same version as the plugin; missing or stale -> /update-workspace; newer than the plugin -> update the plugin |
    | `version_lockstep` | all three agree; installed ABOVE both records -> an upgrade is owed: offer /update-workspace, never a bare stamp; records disagree with each other -> offer "stamp the version" |
    | `registry` | registry validates; spec copy current per `materialize_registration_spec.py --check` |
    | `context_weight` | startup tokens and band; AMBER/RED -> propose the prune tool, never run it unasked |
-   | `results_ledgers` | results envelopes validate; failures counted |
+   | `results_ledgers` | results envelopes validate; failures counted and named, never edited - a team's `results.json` is that team's record |
    | `schedules` | recurring jobs firing; enabled-but-silent is THE finding; skipped when no list given |
    | `seat_contract` | seat identity, foreign writes, missing stamps, sync hazards |
    | `fleet_sweep` | monthly Foundry sweep; skipped outside the window or without a Foundry |
@@ -100,8 +112,13 @@ into a check that READS one.**
 - Never auto-fix anything destructive; offer, then wait. Repairs correct
   records only; real migration is /update-workspace.
 - Never report a number the owner cannot trace to the evidence.
+- Never edit a team's `results.json`, not even to "fix" a failing one: only the team that made
+  the run writes it, and its timestamps and completion answers cannot be known after the fact.
+  Name the file and the missing fields, and say which team to update or re-run.
 - Suggest a weekly scheduled run once, when everything is first green.
 
 ## File anchoring (critical)
 
 Kernel preamble §2 applies: `references/kernel-preamble.md`.
+
+Kernel preamble §5 applies: `references/kernel-preamble.md`.

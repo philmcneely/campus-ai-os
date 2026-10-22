@@ -158,6 +158,15 @@ def gate(src: Path):
         print(r.stdout.strip() or r.stderr.strip())
         if r.returncode != 0:
             sys.exit("FAIL: contracts/campus.json is stale or a literal drifted - run tools/build_contract.py, then re-run")
+    # The campus kit (.campus-os/kernel/) is checked file by file against tools/kit-manifest.json; a
+    # manifest older than the files it hashes would make every buyer's kit look damaged.
+    kit_tool = src / "tools" / "kernel_kit.py"
+    if kit_tool.is_file():
+        r = subprocess.run([sys.executable, str(kit_tool), "manifest", "--check", "--kernel", str(src)],
+                           capture_output=True, text=True)
+        print(r.stdout.strip() or r.stderr.strip())
+        if r.returncode != 0:
+            sys.exit("FAIL: tools/kit-manifest.json is stale - run tools/kernel_kit.py manifest --write, then re-run")
 
 
 def changelog_gate(src: Path, version: str):

@@ -57,7 +57,8 @@ shared/          business.md (answers 1-3, verbatim where possible), voice.md (D
                  every installed team resolves through the CAMPUS copy, so a kernel
                  fix reaches them all without repackaging; update-workspace refreshes
                  the same three),
-                 scan/ (empty; hr-registry fills it on first run)
+                 scan/ (empty; hr-registry fills it on first run),
+                 kernel/ (the kernel kit, core tier - see "Kernel kit" below)
 atlas/config/    (empty; the strategy and research team's private config lands
                  here as niche.md on first /atlas-setup)
 active-work/  inputs/  outputs/  wiki/  daily/
@@ -164,6 +165,27 @@ redirect.
   literal. On a re-run, never regress a marker already equal to or higher
   than `OS_VERSION`.
 - `created` - the date.
+
+## Kernel kit (`.campus-os/kernel/`)
+
+Write it before any other `.campus-os/` step: the materialized spec and every later tool call
+run from it (`.campus-os/run-id-and-interop.md` §0 owns the rules). The list is the `core` tier
+of the plugin's `tools/kit-manifest.json`.
+
+1. **Plugin and campus visible to one shell** (Claude Code, Codex): `python3 -I -B tools/kernel_kit.py
+   install --campus-root {root}` from the plugin root.
+2. **Otherwise** (Cowork: the plugin is in a cloud container, the campus is mounted in a separate
+   shell): with file tools, read each `tiers.core` file from the plugin and write the same bytes
+   to `.campus-os/kernel/<same path>`; then write `tools/kit-manifest.json` as
+   `.campus-os/kernel/KIT.json`, unchanged.
+3. **Check against the plugin**, never against the kit's own stamp: the way
+   `.campus-os/run-id-and-interop.md` §0 says (path 1: the plugin's own `kernel_kit.py check
+   --manifest`; path 2: your own inline hash command compared with the plugin's manifest). A
+   changed or missing file: copy that file again, once, then check again. Still failing, or no
+   Python: finish founding, tell the owner the kit could not be verified, and follow §0's by-hand
+   rule; `/campus-doctor` reports it.
+
+Kit files hold no owner data. Never edit them; updates replace them.
 
 ## Parity and idempotency with `/update-workspace`
 

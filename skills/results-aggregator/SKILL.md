@@ -10,6 +10,8 @@ department: kernel
 
 # results-aggregator — read the back socket
 
+Kernel preamble §5 applies: `references/kernel-preamble.md`.
+
 Internal. Scans the handoff location for every team's `results.json`, parses them, and groups by `run_id` so one topic's whole journey across teams is one row. It NEVER rewrites another team's ledger — append-only, per-team (Team Interop Spec v1 §3).
 
 ## CRITICAL DIRECTIVES

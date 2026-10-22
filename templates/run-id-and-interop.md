@@ -17,15 +17,52 @@ without any of them repackaging.
 A team never bundles a third copy. If neither exists the campus is not installed: stop with the
 no-campus line ("This team runs on Campus AI OS — it's free. Install it first, then run me again.").
 
+## 0. Where kernel tools run — the campus kit (`{kernel}`)
+The installed plugin and the campus can sit on different machines (Cowork: the plugin in a cloud
+container, the campus mounted in a separate device shell). A tool run from the plugin there cannot
+see the campus. So the campus holds a copy of the kernel tools it needs, the **kernel kit**:
+`.campus-os/kernel/`, same folder layout as the plugin, with `KIT.json` (kit version + a sha256 per
+file). Founding writes it; `/update-workspace` and `/campus-doctor` refresh it.
+- **`{kernel}`** in every command below = `.campus-os/kernel` on the campus. Run from the campus root
+  **in the shell that can see the campus folder** (in Cowork: the device shell, not the plugin's container).
+- **Always run kit Python tools as `python3 -I -B`.** `-I` keeps the kit folder from being searched
+  before the standard library (a planted `secrets.py` would otherwise load), and `-B` writes no
+  bytecode into the kit. The kit holds only the files the plugin lists: any other file, cache
+  (`__pycache__`, `.pyc`) or link means do not run it.
+- **Before the first tool call in a session, check the kit against the PLUGIN, never against itself.**
+  The campus can be shared or written by other teams, and anyone who can edit a kit file can edit
+  `KIT.json` too, so the expected hashes always come from the installed plugin's
+  `tools/kit-manifest.json`:
+  - *One shell sees plugin and campus* (Claude Code, Codex): run the plugin's own copy,
+    `python3 -I -B <plugin>/tools/kernel_kit.py check --campus-root <campus> --manifest <plugin>/tools/kit-manifest.json`
+    (it also fails on any file the manifest does not list).
+  - *Only the campus is visible* (Cowork): read `tools/kit-manifest.json` from the plugin with file
+    tools, then hash the kit with a command you type yourself, not with a kit tool, which could be
+    the edited file: `python3 -I -B -c 'import hashlib,os;k=".campus-os/kernel";[print("LINK" if os.path.islink(p) else hashlib.sha256(open(p,"rb").read()).hexdigest(), os.path.relpath(p,k)) for d,ds,fs in os.walk(k) for p in sorted(os.path.join(d,x) for x in ds+fs) if os.path.islink(p) or os.path.isfile(p)]'`.
+    It lists every file and link in the kit. Each line must be in the manifest's `files` with the
+    same hash; the only other line allowed is `KIT.json`. Any extra line (an unlisted file, a cache,
+    a `LINK`) or any manifest file missing → the kit fails. Also compare `KIT.json`'s
+    `kernel_version` with the manifest's.
+  - All hashes match, nothing extra, and the versions are equal → use the kit. Stale, missing,
+    changed, extra, or a link → do not run it; run `/update-workspace` (it moves unlisted files to
+    `.campus-os/kernel-quarantine/` and re-copies the kit; a link is left for the owner), or this once use
+    the plugin's own `tools/` if one shell sees both. `newer` (the kit says a later version than the
+    plugin) → do not run it either: either the plugin on this machine is old (tell the owner to update
+    it) or the stamp was planted. Never copy an older kit over a newer one unless the owner says the
+    stamp is wrong (`kernel_kit.py install --repair`).
+- **No Python, no kit that passes the check, and no shell that sees both:** do the step by hand and say so in the run's
+  report. A hand-made run_id uses the real current UTC time (never a round placeholder such as
+  `…-000000000`), and `results.json` records `"run_id_minted_by": "hand"`. Never claim a validator ran.
+
 ## 1. run_id — minted once, inherited everywhere
-- **Mint** with the campus minter: `python3 {kernel}/tools/mint_run_id.py mint <slug> --team <team> --campus-root .`
+- **Mint** with the campus minter: `python3 -I -B {kernel}/tools/mint_run_id.py mint <slug> --team <team> --campus-root .`
   (the Foundry's `mint-run-id` is a thin adapter over the same module). Canonical shape:
   `{slug}-{YYYYMMDD-HHMMSSfff}` (UTC, millisecond), plus `-xxxx` only on a same-millisecond collision.
   The model never invents a run_id.
 - **Inherit** a `run_id` that arrives on a fed `brief.json` or a playbook-stage input **unchanged**.
   Never re-mint an inherited id. One run_id per run, stamped on every output and on the ledger line.
 - **Read permissively.** Older ids (`{team}-{YYYYMMDD-HHMMSS}`, `{YYYYMMDD}-{slug<=24}-{4char}`,
-  `…T…Z` stamps) parse via `tools/mint_run_id.py parse` and are never rejected on read. New writes
+  `…T…Z` stamps) parse via `{kernel}/tools/mint_run_id.py parse` and are never rejected on read. New writes
   use the canonical shape only.
 
 ## 2. Run directory — one path builder
@@ -34,11 +71,11 @@ no-campus line ("This team runs on Campus AI OS — it's free. Install it first,
 The minter creates the directory; drafts, `MANIFEST.json` and `results.json` land in **that** directory.
 The registry `results` field (`…/runs/{team}/{slug}/results.json`) names the *prefix*; the run_id level
 below it is canonical (Phase 3.5 decision; the aggregator scans `runs/**/results.json`, so both levels read).
-Ask `tools/mint_run_id.py path --team T --slug S [--run-id R]` rather than formatting the path yourself.
+Ask `{kernel}/tools/mint_run_id.py path --team T --slug S [--run-id R]` rather than formatting the path yourself.
 
 ## 3. results.json — the back socket, envelope v1.1
 Canonical definition: `schemas/results.schema.json` in the kernel (byte-identical copy in the Foundry).
-Validate or classify with `tools/validate_results.py`. Write shape, every run:
+Validate or classify with `{kernel}/tools/validate_results.py`. Write shape, every run:
 
 | Field | Value |
 |---|---|
@@ -84,7 +121,7 @@ One per run, in the run directory: `started`, `last_updated`, `status`, `current
 3. No asset is `published`, `sent` or `scheduled` unless a named owner grant authorized it —
    otherwise the draft-first floor was breached.
 4. No orphan artifact on disk missing from `assets[]`.
-5. `results.json` classifies `v1.1-valid` (`tools/validate_results.py FILE`).
+5. `results.json` classifies `v1.1-valid` (`{kernel}/tools/validate_results.py FILE`).
 In draft state `external_ref: null` and `attribution: {}` are correct and are never flagged.
 
 ## 8. CTA attribution — a contract, never a vendor literal

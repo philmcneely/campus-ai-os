@@ -17,6 +17,8 @@ Turns a session into compounding, sellable context. **Two physically separate ti
 
 Kernel preamble §4 applies: `references/kernel-preamble.md`.
 
+Kernel preamble §5 applies: `references/kernel-preamble.md`.
+
 ## CRITICAL DIRECTIVES
 - **Tier 1 = private factory; Tier 2 = servable product.** Raw logs are never registered as servable. Distilled records carry gate fields.
 - **Checkpoint Tier 1 after EVERY answer** — not only at the end. This guards long sessions against context loss.

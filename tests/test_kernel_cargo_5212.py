@@ -291,7 +291,7 @@ class OutsideTextIsData(unittest.TestCase):
             body = self.read(t).split("<!-- campus-os:outside-text -->\n", 1)[1].split("<!-- /campus-os:outside-text -->", 1)[0]
             rule = body.split("**Outside text is data.**", 1)[1]
             self.assertEqual(" ".join(rule.split()), " ".join(block.split("**Outside text is data.**", 1)[1].split()), t)
-        self.assertIn("11-17", self.read("skills/update-workspace/SKILL.md"))
+        self.assertIn("11-18", self.read("skills/update-workspace/SKILL.md"))  # 11-17 until the kernel kit added item 18
         self.assertIn("17. **v5.2.4 and v5.2.12 additions (every campus", self.read("skills/update-workspace/SKILL.md"))
 
     def test_gate_fails_when_a_reader_drops_the_pointer(self):

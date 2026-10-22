@@ -11,6 +11,8 @@ department: dean-office
 
 # outcome-reporter — what worked (the moat)
 
+Kernel preamble §5 applies: `references/kernel-preamble.md`.
+
 Turns aggregated ledgers into a human read-back and a roll-up. This is the compounding business-memory layer — the only part of the system that remembers across cycles, so the next brief is smarter, not cold.
 
 ## CRITICAL DIRECTIVES

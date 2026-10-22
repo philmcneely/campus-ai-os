@@ -155,7 +155,7 @@ Nothing goes in the workspace root.
    should stay under 10% of the context window (GREEN); at 10-20% (AMBER)
    an archive is due; above 20% (RED) a fifth of every session is gone
    before the first question. Measure it, never guess it:
-   `node tools/context-weight.mjs` (the plugin's tools folder). When it says
+   `node .campus-os/kernel/tools/context-weight.mjs` (the campus kit; else the plugin's tools folder). When it says
    AMBER or RED, `node tools/context-prune.mjs` proposes which aged entries
    move to `dean/archive/` - only entries marked `[archive-eligible]`; mark
    one `[pinned]` (or write it as a standing rule) and it never moves, whatever

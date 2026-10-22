@@ -17,6 +17,8 @@ The extraction engine for the business-memory moat. Where the council *converges
 
 Kernel preamble §4 applies: `references/kernel-preamble.md`.
 
+Kernel preamble §5 applies: `references/kernel-preamble.md`.
+
 ## CRITICAL DIRECTIVES
 - **One question at a time. Ask → get the answer → ask the next. Never batch, never form-dump.**
 - **For each question, offer your recommended answer** the user can accept or override (lowers effort, speeds the grill).

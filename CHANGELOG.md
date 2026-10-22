@@ -4,6 +4,73 @@ All notable changes to the Campus AI OS kernel. Format follows Keep a Changelog;
 
 ## [Unreleased]
 
+## [5.2.17] - 2026-10-22
+
+Carries all of 5.2.16 (kernel kit, the Codex F1 repair, the campus finder) plus one fix found while the 5.2.16 audit was under way (WO-2026-10-20-06).
+
+### Security
+- **Quarantine never follows a link out of the campus.** The F1 repair added a quarantine for unlisted kit files under `.campus-os/kernel-quarantine/`. If `kernel-quarantine` was a planted link, `install --repair` followed it and moved the unlisted files outside the campus, into a folder and under file names the planter chose. A file of their choosing could land anywhere the owner can write. Now the quarantine refuses a link at `.campus-os` or `kernel-quarantine` and moves nothing; each run creates a fresh folder `{UTC stamp}-{12 hex}` that must not already exist; it only moves into folders it just created; it never replaces an existing entry.
+
+### Added
+- Fixtures: a planted quarantine link is refused with nothing moved outside and the file left for the owner (the check still flags it); every quarantine gets a fresh, unguessable folder. Mutation-checked: without the link checks, the first fixture fails.
+
+## [5.2.16] - 2026-10-22 (never published: superseded by 5.2.17 during its audit)
+
+Carries all of 5.2.15 (the Codex audit F1 repair) plus one campus-finder fix, folded in before 5.2.15 was audited, on the owner's call (WO-2026-10-20-06).
+
+### Fixed
+- **The campus is found when the host opens the folder above it.** The campus rule only walked up from the working folder. The owner's Cowork mounts `TrainingSites/` while the campus is the child `TrainingSites/Claude-Cowork/`, so `resolve_context.py --find-campus` found nothing from the mount (exit 3), and every team that followed the rule said "install Campus OS first" (reported by the Email Desk session, 2026-10-22). Now, when nothing above is a campus, the finder accepts exactly one campus among the start folder's children: real folders only, hidden folders and links skipped, one level down. Two or more child campuses are never guessed between: `--find-campus` exits 3 and lists them (`several_campuses`), and a concept lookup refuses until the owner picks. A campus above still wins. `--json` now says how it was found (`here`, `above`, `child`). The one owner of the rule, `templates/context-files.md` ("Campus rule"), says the same.
+
+### Added
+- `tests/test_campus_finder_5216.py`: the mount-above layout, two children refused, a campus above wins, hidden and linked children ignored, only one level down.
+
+### Known gaps
+- `context-weight.mjs` and `/campus-map` keep their own walk-up (the doctor passes `--root`); teams that run with `--campus-root .` from the mount folder should `cd` into the campus first (Email Desk 1.0.2 does).
+
+## [5.2.15] - 2026-10-22 (never published: superseded by 5.2.16 before its audit)
+
+Repairs the one release blocker from the Codex audit of the packaged 5.2.14 artifact (`outputs/2026-10/reports/2026-10-22-campus-ai-os-v5.2.14-codex-audit.md`). 5.2.14 was never published; this release carries all of its kernel-kit work (see the [5.2.14] entry) plus the fix below (WO-2026-10-20-06).
+
+### Security
+- **The kit runs only the bytes it checked (audit F1).** The 5.2.14 check compared the files the plugin lists but accepted anything else in the kit, and kit tools import from their own folder. A campus writer could add a stdlib-named module (`tools/secrets.py`) or a bytecode cache stamped to match a real source (`tools/__pycache__/contract.*.pyc`); the plugin-anchored check still said OK, and the minter or the doctor then ran the planted code. Now:
+  - `kernel_kit.py check` fails on any file, cache folder or link in the kit that the manifest does not list (`unexpected`), and checks every on-demand file that is present, not only the core tier.
+  - Kit tools run as `python3 -I -B` (canon §0, preamble §5, every documented command): the kit folder is never searched before the standard library, and no bytecode is written into the kit.
+  - The two tools that import their siblings (`doctor_evidence.py`, `resolve_context.py`) put the kit folder at the end of the import path and, when run as tools, point Python's bytecode cache at an unguessable path that does not exist, so a planted `__pycache__` is never read. The doctor runs its sub-tools the same way (`-I -B -X pycache_prefix=…`).
+  - `install` (and `--repair`) moves unlisted files and caches to `.campus-os/kernel-quarantine/{UTC stamp}/` before copying (moved, never deleted) and reports them; a link inside the kit is refused for the owner to remove.
+  - The Cowork inline check in canon §0 lists every file and link in the kit (links as `LINK`), so an extra file or a cache fails it there too.
+- The doctor's `kernel_kit` line fails on unlisted files and on an unreadable stamp, and its OK wording now says what was checked: "every file present matches the plugin and nothing else is in it" (audit observation 1).
+- A malformed `KIT.json` (non-string paths, wrong types) is reported as `stamp_invalid` instead of raising; duplicate paths are checked once; a path outside the kit is reported as changed, never read.
+
+### Added
+- Fixtures for both audit probes and for repair: an unlisted module fails the anchored check and does not run under the documented command; a planted cache fails the check and is not loaded by the doctor or the campus finder even if the check is skipped; repair quarantines both and the kit checks clean again; a changed on-demand file fails a core check; a malformed stamp is reported. Mutation-checked: without the cache redirect the doctor runs the planted cache; without the unexpected-file rule both probes pass the check; without quarantine repair leaves the payload.
+
+### Corrections to the [5.2.14] entry
+- Its "Known gaps" line "Not yet proven in a live Cowork session" is out of date: the live Cowork gate passed on 2026-10-22 (fresh campus founded with the kit, byte-identical to the manifest; the owner's campus upgraded 5.2.13 -> 5.2.14). 5.2.14 was never published.
+
+## [5.2.14] - 2026-10-21 (never published: failed the Codex artifact audit, F1; superseded by 5.2.15)
+
+The kernel kit: kernel tools now run from a copy inside the campus, so they work in cloud Cowork (WO-2026-10-20-06; James chose option A, 2026-10-21). Test build on the branch; publish only after the Cowork release gate.
+
+### Fixed
+- **Kernel tools could not reach the campus in cloud Cowork.** Cowork runs the installed plugin in a cloud container that cannot see the campus; the campus is mounted in a separate device shell with Python but no plugin. Sessions typed run_ids by hand with round placeholder times (`…-000000000`) and skipped every validator, and `/campus-doctor` could not run (Email Desk tests, 2026-10-20 and 2026-10-21). The kernel now keeps a **kernel kit** in the campus, `.campus-os/kernel/`: a mirror of the tools a campus needs in the plugin's own folder layout, stamped with `KIT.json` (kit version + sha256 per file). The tools find their files relative to themselves, so they need no changes. Same pattern as the campus copy of `resolve-seat.py`.
+- `tools/doctor_evidence.py` imports its sibling tools under `python3 -I` (isolated mode left the script folder off `sys.path`).
+- `/campus-doctor` never edits a team's `results.json`. On the 5.2.14 Cowork test it "fixed" a failing Email Desk file by stamping its own time as `generated_at` and guessing all three completion answers. It now names the file, the missing fields and the owning team, and offers to update or re-run that team.
+
+### Security
+- **The kit is checked against the plugin, never against itself** (security review of this branch, 2026-10-21). Anyone who can write the campus (a shared folder, another team, an AI session following injected text) could edit a kit tool and recompute its hash in `KIT.json`; a check that trusts the campus stamp would pass it. `kernel_kit.py check --manifest` takes the expected hashes and version from the installed plugin's `tools/kit-manifest.json`; the doctor anchors on it (this tree's when run from the plugin, `--kit-manifest` when run from the kit) and reports a kit that matched only its own stamp as unchecked, never `ok`. In Cowork the canon has the model hash the kit with its own inline command, not a kit tool, and compare with the manifest it read from the plugin. A changed or `newer` kit is never run; a planted newer stamp no longer blocks repair forever (`install --repair`, on the owner's go).
+- **`install` never writes through a symlink.** A planted link at `.campus-os`, the kit folder, a subfolder or a kit file is refused, every write goes to a fresh file renamed into place, and nothing lands outside `.campus-os/kernel/`. `check` counts a kit file that is a symlink as changed.
+
+### Added
+- **`tools/kernel_kit.py`** - the one owner of the kit list (`core`, `on_demand`, `plugin_only`, `maintainer_only`); `manifest` (writes/checks `tools/kit-manifest.json`), `check` (file-by-file sha256, and `current` / `stale` / `newer` against the installed plugin), `install` (where one shell sees plugin and campus). Forward-only: a newer kit is never replaced by an older one.
+- **Where kernel tools run, defined once:** `templates/run-id-and-interop.md` §0 (the campus copy reaches every installed team, so no team repackages) defines `{kernel}` = `.campus-os/kernel`, the check before first use, and the by-hand fallback (real UTC time, never a placeholder; `run_id_minted_by: "hand"`). Kernel preamble §5 points kernel skills at it.
+- `/campus-start` writes the core kit first (file-tool copy where the plugin cannot see the campus); `/update-workspace` item 18 copies or refreshes it on every path, the up-to-date path included; `/campus-doctor` runs from the kit with `--installed-version` and gains a thirteenth section, `kernel_kit`.
+- `tools/package.py` refuses to package with a stale `tools/kit-manifest.json`; build gate 8b requires both founding and upgrade to create `.campus-os/kernel/`; `tests/test_kernel_kit.py` runs the kit with the plugin tree deleted and fails when any skill, canon or contract names a `tools/` script that no kit list accounts for.
+
+### Known gaps
+- `tools/gen_department_entries.py` (item 12e's org-chart re-derive) reads the whole niche pack and stays plugin-only; where no shell sees the plugin, the re-derive is skipped and said.
+- `/campus-map` still runs `${CLAUDE_PLUGIN_ROOT}/campus-map/generate.mjs`.
+- Not yet proven in a live Cowork session: the file-tool copy, the device shell's Python version, and `node` there (the release gate).
+
 ## [5.2.13] - 2026-10-18
 
 Repairs the one release blocker from the Codex audit of the packaged 5.2.12 artifact (`outputs/2026-10/reports/2026-10-17-campus-ai-os-v5.2.12-codex-audit.md`). 5.2.12 was never published; this release carries everything in its entry below. Patch: no new keys.

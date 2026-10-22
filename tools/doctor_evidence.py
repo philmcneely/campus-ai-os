@@ -12,10 +12,24 @@ import shutil
 import subprocess
 import sys
 
-from contract import Resolver, ContractError
+import tempfile
+
+# Kit copies run from .campus-os/kernel/tools, a folder other campus writers can reach (Codex audit F1,
+# 5.2.14). Sibling modules are found at the END of the path, so a planted file can never shadow the
+# standard library, and Python's bytecode cache points at an unguessable path that does not exist,
+# so a planted __pycache__ is never read and nothing is written into the kit. Run as `python3 -I -B`.
+NO_CACHE = os.path.join(tempfile.gettempdir(), f"campus-os-nocache-{os.getpid()}-{os.urandom(8).hex()}")
+if __name__ == "__main__":  # only when run as a tool; an importing program keeps its own settings
+    sys.dont_write_bytecode = True
+    sys.pycache_prefix = NO_CACHE
+sys.path.append(str(Path(__file__).resolve().parent))
+from contract import Resolver, ContractError  # noqa: E402
+import kernel_kit  # noqa: E402
 
 KERNEL = Path(__file__).resolve().parent.parent
-ORDER = ('workspace', 'version_lockstep', 'registry', 'context_weight', 'results_ledgers',
+# Sub-tools run isolated (no script folder or env on the path), write no bytecode, read none from the kit.
+PY_ISOLATED = ['-I', '-B', '-X', f'pycache_prefix={NO_CACHE}']
+ORDER = ('workspace', 'version_lockstep', 'kernel_kit', 'registry', 'context_weight', 'results_ledgers',
          'schedules', 'seat_contract', 'fleet_sweep', 'staff', 'context_files', 'stale_work', 'ledger')
 PREFIX = {'ok': '[OK]', 'opportunity': '[--]', 'needs-decision': '[!!]', 'skipped': '[--]', 'error': '[!!]'}
 
@@ -42,8 +56,9 @@ class SubtoolError(Exception):
 
 
 class Evidence:
-    def __init__(self, root, today, window=None, scheduled=None, sweep=False):
+    def __init__(self, root, today, window=None, scheduled=None, sweep=False, installed=None, kit_manifest=None):
         self.root, self.today, self.window = root, today, window
+        self.installed, self.kit_manifest = installed or (kit_manifest or {}).get('kernel_version'), kit_manifest
         self.asof = dt.datetime.combine(today, dt.time(), dt.timezone.utc)
         self.scheduled, self.sweep = scheduled, sweep
         self.contract = Resolver()
@@ -51,7 +66,8 @@ class Evidence:
 
     def tool(self, name, *args, accepted=(0,), stdin='', command=None):
         runtime = shutil.which('node') if name.endswith('.mjs') else sys.executable
-        argv = command or [runtime, str(KERNEL / 'tools' / name), *map(str, args)]
+        isolate = [] if name.endswith('.mjs') else PY_ISOLATED
+        argv = command or [runtime, *isolate, str(KERNEL / 'tools' / name), *map(str, args)]
         try:
             p = subprocess.run(argv, cwd=self.root, env=self.env, input=stdin,
                                text=True, capture_output=True, timeout=60)
@@ -95,12 +111,51 @@ class Evidence:
         manifest = next((KERNEL / rel for rel in candidates if (KERNEL / rel).is_file()), None)
         if manifest is None:
             return section('error', 'Installed manifest cannot be resolved', candidates=candidates)
-        installed = read_json(manifest).get('version')
+        installed = self.installed or read_json(manifest).get('version')
         good = isinstance(installed, str) and bool(installed) and workspace == registry == installed
         return section('ok' if good else 'needs-decision',
                        f'Version current (v{installed}) - workspace, registry and installed plugin agree' if good else
                        f'Version homes disagree: workspace {workspace} / registry {registry} / installed {installed}',
                        workspace=workspace, registry=registry, installed=installed, manifest=str(manifest))
+
+    def kernel_kit(self):
+        # The campus copy of the kernel tools (.campus-os/kernel/, tools/kernel_kit.py). The expected
+        # hashes and version come from the INSTALLED PLUGIN's kit manifest - this tree's when this tool
+        # runs from the plugin, else --kit-manifest - never from the campus stamp alone: anyone who can
+        # edit a kit file can edit KIT.json too.
+        from_kit = KERNEL.resolve() == (self.root / kernel_kit.KIT_DIR).resolve()
+        manifest = self.kit_manifest
+        if manifest is None and not from_kit and (KERNEL / kernel_kit.MANIFEST).is_file():
+            manifest = read_json(KERNEL / kernel_kit.MANIFEST)
+        installed = self.installed or (manifest or {}).get('kernel_version') or \
+            (None if from_kit else kernel_kit.kernel_version(KERNEL))
+        r = kernel_kit.check(self.root, installed, tier='core', manifest=manifest)
+        detail = {k: r[k] for k in ('present', 'anchor', 'kernel_version', 'installed_version', 'version',
+                                    'missing', 'mismatched', 'unexpected', 'stamp_invalid')}
+        if not r['present']:
+            return section('opportunity', 'Kernel kit not in the campus yet - /update-workspace copies it', **detail)
+        if r['stamp_invalid']:
+            return section('needs-decision', 'Kernel kit stamp is unreadable - do not run it; /update-workspace '
+                           're-copies the kit', **detail)
+        if r['unexpected']:
+            return section('needs-decision', f"Kernel kit holds {len(r['unexpected'])} file(s) the plugin does not "
+                           "list - do not run it; /update-workspace moves them to .campus-os/kernel-quarantine/ "
+                           "and re-checks", **detail)
+        if r['missing'] or r['mismatched']:
+            return section('needs-decision', f"Kernel kit damaged or changed: {len(r['missing'])} missing, "
+                           f"{len(r['mismatched'])} changed - do not run it; /update-workspace re-copies it", **detail)
+        if r['version'] == 'stale':
+            return section('needs-decision', f"Kernel kit is v{r['kernel_version']}, plugin is v{installed} - "
+                           "/update-workspace refreshes it", **detail)
+        if r['version'] == 'newer':
+            return section('needs-decision', f"Kernel kit says v{r['kernel_version']}, newer than the plugin "
+                           f"(v{installed}) - do not run it; update the plugin, or repair the kit if the owner "
+                           "says that stamp is wrong", **detail)
+        if manifest is None:
+            return section('opportunity', 'Kernel kit matches its own stamp only - pass --kit-manifest (the '
+                           "plugin's tools/kit-manifest.json) to check it against the installed plugin", **detail)
+        return section('ok', f"Kernel kit current (v{r['kernel_version']}), every file present matches the plugin "
+                       "and nothing else is in it", **detail)
 
     def registry(self):
         states = {}
@@ -151,13 +206,13 @@ class Evidence:
             return section('skipped', 'Schedule check skipped: no live task list supplied', reason='no-live-task-list')
         # The existing CLI has no --today. Inject its public health helper's
         # supported `now` parameter, then call its unchanged CLI for all logic.
-        code = ('import sys, datetime as dt; sys.path.insert(0, sys.argv[1]); '
+        code = ('import sys, datetime as dt; sys.path.append(sys.argv[1]); '
                 'import check_cron_parity as tool; original = tool.assess_health; '
                 'now = dt.datetime.fromisoformat(sys.argv[2]); '
                 'tool.assess_health = lambda live: original(live, now=now); '
                 'sys.argv = [tool.__file__, "--scheduled", sys.argv[3], "--json"]; '
                 'raise SystemExit(tool.main())')
-        command = [sys.executable, '-c', code, str(KERNEL / 'tools'), self.asof.isoformat(), str(self.root / 'scheduled')]
+        command = [sys.executable, *PY_ISOLATED, '-c', code, str(KERNEL / 'tools'), self.asof.isoformat(), str(self.root / 'scheduled')]
         data, rc = self.tool('check_cron_parity.py', command=command, stdin=self.scheduled, accepted=(0, 1))
         if data['scheduler']['status'] == 'unavailable':
             return section('skipped', 'Scheduler unavailable on this host', **data)
@@ -338,6 +393,9 @@ def main(argv=None):
     ap.add_argument('--window', type=int, help='context window in tokens (delegated to context-weight)')
     ap.add_argument('--scheduled-json', help='live scheduler response file; - reads stdin; relative paths are campus-relative')
     ap.add_argument('--sweep', action='store_true')
+    ap.add_argument('--installed-version', help='installed plugin version, read from its manifest (pass it when running from the campus kit)')
+    ap.add_argument('--kit-manifest', help="the installed plugin's tools/kit-manifest.json; '-' reads it from stdin "
+                                           '(pass it when running from the campus kit)')
     a = ap.parse_args(argv)
     root = Path(a.campus_root).resolve()
     today = a.today or dt.datetime.now(dt.timezone.utc).date()
@@ -351,10 +409,18 @@ def main(argv=None):
             except (OSError, UnicodeError) as exc:
                 # Carry the read failure into schedules without losing other sections.
                 schedule_error = str(exc)
-        elif a.scheduled_json == '-':
+        kit_manifest = None
+        if a.kit_manifest:
+            if a.kit_manifest == '-' and a.scheduled_json == '-':
+                raise SystemExit('FAIL(2): only one of --kit-manifest and --scheduled-json can read stdin')
+            try:
+                kit_manifest = json.loads(sys.stdin.read() if a.kit_manifest == '-' else Path(a.kit_manifest).read_text(encoding='utf-8'))
+            except (OSError, ValueError) as exc:
+                raise SystemExit(f'FAIL(2): --kit-manifest unreadable: {exc}')
+        if a.scheduled_json == '-':
             raw = sys.stdin.read()
             scheduled = raw if raw.strip() else None
-        result = Evidence(root, today, a.window, scheduled, a.sweep).run()
+        result = Evidence(root, today, a.window, scheduled, a.sweep, a.installed_version, kit_manifest).run()
         if schedule_error:
             result['schedules'] = section('error', 'Schedule input could not be read', stderr_tail=schedule_error[-2000:])
     except ContractError as exc:

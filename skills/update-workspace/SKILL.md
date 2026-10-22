@@ -5,7 +5,7 @@ description: >
   installed version, keeping everything the owner wrote intact. Use when the
   owner says "/update-workspace", "upgrade my campus", "update my campus", or
   when an older campus is detected.
-version: 5.2.13
+version: 5.2.17
 department: kernel
 ---
 
@@ -34,13 +34,14 @@ file, `shared/` with content, `.campus-os/`. Route by comparing the campus
 marker to `OS_VERSION`:
 
 - **No markers:** fresh folder; offer /campus-start, never build here.
-- **Marker == `OS_VERSION`:** "You're already up to date." Offer
+- **Marker == `OS_VERSION`:** "You're already up to date." Run item 18
+  only (the kit check; a missing or damaged kit is re-copied), then offer
   /campus-doctor. The ONLY up-to-date case: a comparison, never a literal.
 - **Marker < `OS_VERSION`:** an upgrade is owed. Pick the entry point for
   that marker from `baseline-items.md`.
 
 🔒 **Closing rule - every upgrade path ends the same way, no exceptions.**
-Whatever the entry point, finish with additions items 11-17 (idempotent)
+Whatever the entry point, finish with additions items 11-18 (idempotent)
 and stamp `OS_VERSION`.
 
 📌 Non-default campuses are normal: read names and folders from what exists.
@@ -66,7 +67,9 @@ never rewritten); ledger header; `shared/setup-progress.md` with the goals
 row; goals stub if absent; `dean/skill-candidates/`; item 8,
 `.campus-os/registration-block-spec.md`, now item 16.
 
-**Items 11-17 run on every path** (`additions.md`):
+**Items 11-18 run on every path** (`additions.md`). Item 18 (the kernel
+kit) runs FIRST, before item 11: every later `tools/` command runs from
+the kit (Kernel preamble §5).
 
 11. **v4 additions (every campus, run last).**
     a. Stamp three targets with `OS_VERSION`, resolved at runtime:
@@ -113,6 +116,12 @@ row; goals stub if absent; `dean/skill-candidates/`; item 8,
     `<!-- campus-os:outside-text -->` if absent (owner text never rewritten),
     and say once that `tools/resolve_context.py` now finds the campus and its
     context files. The 12e canon refresh already carries the new read order.
+18. **Kernel kit (every campus, kernel-owned files only).** Copy or refresh
+    `.campus-os/kernel/` from the plugin's `tools/kit-manifest.json`: the
+    `core` tier always, the `on_demand` tier when this run uses one of its
+    tools; then `kernel_kit.py check --installed-version {OS_VERSION}`.
+    Forward-only: a kit newer than the plugin is never replaced. Steps, the
+    Cowork path and the fallback: `additions.md` item 18.
 
 ## Step 4b - Department managers
 
@@ -135,3 +144,5 @@ twice adds nothing twice.
 ## File anchoring (critical)
 
 Kernel preamble §2 applies: `references/kernel-preamble.md`.
+
+Kernel preamble §5 applies: `references/kernel-preamble.md`.

@@ -5,7 +5,9 @@ One testable function for the two rules in templates/context-files.md that teams
 in prose (and got wrong on real installs):
 
   campus rule   a folder holding workspace.json plus an accepted entry file (root or dean/),
-                found by walking up from the working folder. Never a fixed folder name.
+                found by walking up from the working folder; if none is above, exactly one campus
+                among the folder's own children (5.2.16 - hosts often open the folder above the
+                campus). Two or more children: not found, listed, the owner picks. Never a fixed name.
   read order    per concept, contracts/campus.json `read_order`: founding name first (unless the
                 row says canonical wins), then canonical, then aliases; each candidate is also
                 matched case-insensitively before the next is tried (5.2.13, audit F1).
@@ -21,10 +23,20 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import tempfile
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Kit copies run from .campus-os/kernel/tools, a folder other campus writers can reach (Codex audit F1,
+# 5.2.14). Sibling modules are found at the END of the path, so a planted file can never shadow the
+# standard library, and Python's bytecode cache points at an unguessable path that does not exist,
+# so a planted __pycache__ is never read and nothing is written into the kit. Run as `python3 -I -B`.
+NO_CACHE = os.path.join(tempfile.gettempdir(), f"campus-os-nocache-{os.getpid()}-{os.urandom(8).hex()}")
+if __name__ == "__main__":  # only when run as a tool; an importing program keeps its own settings
+    sys.dont_write_bytecode = True
+    sys.pycache_prefix = NO_CACHE
+sys.path.append(str(Path(__file__).resolve().parent))
 from contract import ContractError, Resolver  # noqa: E402
 
 
@@ -34,12 +46,29 @@ def is_campus(folder: Path, entry_names) -> bool:
     return any((folder / n).is_file() or (folder / "dean" / n).is_file() for n in entry_names)
 
 
+def child_campuses(start: Path, entry_names) -> list:
+    """Campuses one level BELOW the start folder: real folders only, no links, no hidden folders."""
+    try:
+        kids = sorted(e for e in start.iterdir() if e.is_dir() and not e.is_symlink() and not e.name.startswith("."))
+    except OSError:
+        return []
+    return [k for k in kids if is_campus(k, entry_names)]
+
+
 def find_campus(start: Path, entry_names):
+    """Walk up from the start folder; else accept exactly ONE campus among its children.
+
+    Hosts often open the folder ABOVE the campus (Cowork mounting `TrainingSites/` when the campus is
+    `TrainingSites/Claude-Cowork/`). Two or more child campuses are never guessed between: the owner
+    picks. Returns (campus or None, how: "here" | "above" | "child" | None, candidates)."""
     start = start.resolve()
     for folder in (start, *start.parents):
         if is_campus(folder, entry_names):
-            return folder
-    return None
+            return folder, ("here" if folder == start else "above"), [folder]
+    kids = child_campuses(start, entry_names)
+    if len(kids) == 1:
+        return kids[0], "child", kids
+    return None, None, kids
 
 
 def context_dir(campus):
@@ -84,21 +113,34 @@ def main(argv=None) -> int:
         print(str(exc), file=sys.stderr)
         return 2
     names = resolver.hosts["entry_file_read_names"]
+    candidates = []
     if args.campus_root:
         campus = Path(args.campus_root).resolve()
         if not is_campus(campus, names):
             print(f"USAGE: not a campus (needs workspace.json + an entry file): {campus}", file=sys.stderr)
             return 1
     else:
-        campus = find_campus(Path(args.start), names)
+        campus, how, candidates = find_campus(Path(args.start), names)
 
     if args.find_campus:
+        many = [] if campus or args.campus_root else [str(c) for c in candidates]
         if args.json:
-            print(json.dumps({"campus_root": str(campus) if campus else None}))
+            out = {"campus_root": str(campus) if campus else None}
+            if not args.campus_root:
+                out["found"] = how
+                if many:
+                    out["several_campuses"] = many  # never picked automatically: ask the owner
+            print(json.dumps(out))
         elif campus:
             print(campus)
+        elif many:
+            print("SEVERAL CAMPUSES below this folder - ask the owner which one:\n  " + "\n  ".join(many), file=sys.stderr)
         return 0 if campus else 3
 
+    if campus is None and len(candidates) > 1:
+        print("SEVERAL CAMPUSES below this folder - ask the owner which one, then pass --campus-root:\n  "
+              + "\n  ".join(str(c) for c in candidates), file=sys.stderr)
+        return 3
     try:
         row, path = resolve(args.concept, context_dir(campus), resolver)
     except ValueError as exc:

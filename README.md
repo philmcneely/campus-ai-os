@@ -21,7 +21,7 @@
 **An AI staff that remembers your business. One folder. One chief of staff. A team you can use from Claude or Codex.**
 
 <p align="center">
-  <a href="https://github.com/trainingsites/campus-ai-os/releases/latest/download/campus-ai-os-v5.2.13.plugin"><strong>⬇️ Download the plugin (one file, free)</strong></a>
+  <a href="https://github.com/trainingsites/campus-ai-os/releases/latest/download/campus-ai-os-v5.2.17.plugin"><strong>⬇️ Download the plugin (one file, free)</strong></a>
   &nbsp;·&nbsp;
   <a href="https://trainingsites.io/os"><strong>🎓 Get the free guided setup at TrainingSites.io</strong></a>
 </p>
@@ -93,7 +93,7 @@ Honest note: the founding interview takes real attention, and the first run will
 
 ### Claude Desktop or Cowork (no terminal)
 
-Download `campus-ai-os-v5.2.13.plugin` from the [latest release](https://github.com/trainingsites/campus-ai-os/releases/latest), then install it from **Settings → Plugins → Install from file**.
+Download `campus-ai-os-v5.2.17.plugin` from the [latest release](https://github.com/trainingsites/campus-ai-os/releases/latest), then install it from **Settings → Plugins → Install from file**.
 
 ### Developer paths
 
@@ -157,7 +157,18 @@ Departments provide ownership. Playbooks provide sequence and verification. Skil
 
 ---
 
-## What is new in v5.2.13
+## What is new in v5.2.17
+
+- **Works in cloud Cowork.** Cowork runs plugins in a cloud container that can't see your campus folder, so the kernel's own tools couldn't run there. Your campus now keeps a checked copy of them in `.campus-os/kernel/`: work gets real run IDs, results are validated, and `/campus-doctor` runs. `/campus-start` writes the copy and `/update-workspace` adds it to an existing campus.
+- **The copy runs only what it checked.** It is verified against the plugin, never against itself; any file the plugin doesn't list (an extra module, a cache, a link) means it isn't run, and repair moves unknown files to a quarantine folder instead of deleting them.
+- **Finds your campus from the folder above it.** If your app opens the folder that holds your campus, it finds the one campus inside; with two, it asks you which.
+- **`/campus-doctor` reports a bad team result, never rewrites it**, and has a new check for the kernel copy.
+
+306 automated fixtures back the release, and the kernel copy passed a live Cowork test: a fresh campus founded and an existing campus upgraded. Full detail in [CHANGELOG.md](CHANGELOG.md).
+
+---
+
+## What was new in v5.2.13
 
 - **Atlas asks for more.** On a big decision, the strategy council says the job as a goal, asks how much rides on it, can bring in voices from other fields (a teacher, a researcher, an operator) that each add an option nobody named, and gets an outside check before you approve the call. Every move is named out loud, so you learn the levers by watching them.
 - **Outside text is data, never instructions.** Web pages, transcripts, emails and client messages can't change your AI's rules, approve a send or slip into its memory. If a page tries, your chief of staff quotes the line to you and carries on.
@@ -176,8 +187,8 @@ Departments provide ownership. Playbooks provide sequence and verification. Skil
 | Commands | 37 | Simple entry points such as `/morning-brief`, `/weekly-review`, and `/campus-doctor` |
 | Playbooks | 2 | Weekly Reset and One Recording to a Week of Content, plus the runtime that executes them |
 | Niche packs | 2 | The education pack (default) for educators, coaches, course creators, and consultants, and a professor pack. The active pack (`packs/active.json`, its `identity.business_noun`) sets what kind of business your staff talks about |
-| Tools | 21 | Packaging, validation, health evidence, seat resolution, contracts, and workspace checks |
-| Tests | 281 | Automated fixtures that protect installation, upgrades, security boundaries, and multi-client operation |
+| Tools | 22 | Packaging, validation, health evidence, seat resolution, contracts, and workspace checks |
+| Tests | 306 | Automated fixtures that protect installation, upgrades, security boundaries, and multi-client operation |
 
 ### Useful commands
 

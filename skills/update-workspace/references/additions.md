@@ -1,4 +1,4 @@
-# Additions items 11-17 - rules, idempotency, and why each one exists
+# Additions items 11-18 - rules, idempotency, and why each one exists
 
 Companion to `/update-workspace` Step 4. These run on EVERY upgrade path (the
 closing rule), because an additions item some paths skip is one that silently
@@ -253,4 +253,57 @@ came from, and carry on. (Kernel preamble §4 in the Campus AI OS plugin.)
 ```
 
 **b. Context files, founding first.** Nothing to do here: 12e overwrites `.campus-os/context-files.md`, which now reads the founding file first (`audience.md` before `icp.md`, `business.md` before `identity.md`; offers keeps `offers-summary.md` first). Tell the owner once that a thin `icp.md` / `identity.md` some team wrote earlier no longer hides their full founding answers, and that `/campus-doctor` lists any concept with two files so they can merge them.
+
+## 18 - Kernel kit (`.campus-os/kernel/`, every campus, runs first)
+
+*Why (found 2026-10-21, Email Desk tests in Cowork):* Cowork runs the installed plugin in a cloud
+container that cannot see the campus; the campus is mounted in a separate device shell that has
+Python but no plugin. No session could run the minter, the campus finder or the validators against
+the campus, so run_ids were typed by hand with round placeholder times and every check was skipped.
+The kit puts the tools next to the files. Rules for using it: `.campus-os/run-id-and-interop.md` §0.
+
+**Runs first and on every path, the up-to-date path included.** Items 12e, 16 and 17 run kernel
+tools, and they run from the kit. A campus already on `OS_VERSION` with a missing or damaged kit
+still needs this item, so it is the one item the up-to-date path runs.
+
+**a. Read the plugin's `tools/kit-manifest.json`** (`kernel_version`, `tiers.core`,
+`tiers.on_demand`, `files` = sha256 per path): it is the only reference the kit is checked
+against. If `.campus-os/kernel/KIT.json` exists and its `kernel_version` is NEWER than the
+plugin's: stop this item, do not run any kit tool, and ask the owner. Either their plugin is older
+than their campus (update the plugin, change nothing) or they don't recognise that version (the
+stamp is wrong or was planted): on their explicit go, re-copy with `kernel_kit.py install --repair`
+(file-tool path: copy every listed file over the kit). Never downgrade a kit without that go.
+
+**b. Copy.** Plugin and campus visible to one shell (Claude Code, Codex):
+`python3 -I -B tools/kernel_kit.py install --campus-root {campus_root}` from the plugin root
+(`--tier all` when this run will use an `on_demand` tool). Otherwise (Cowork): with file tools,
+read each listed file from the plugin and write the same bytes to `.campus-os/kernel/<same path>`,
+skipping a file whose campus copy already has the listed sha256; then write the manifest,
+unchanged, as `.campus-os/kernel/KIT.json`.
+
+**c. Check against the plugin, never the kit's own stamp** (`.campus-os/run-id-and-interop.md`
+§0): one shell sees both → `python3 -I -B tools/kernel_kit.py check --campus-root {campus_root}
+--manifest tools/kit-manifest.json` from the plugin root (`--tier all` after an `on_demand` copy);
+Cowork → your own inline hash command in the device shell, compared line by line with the
+manifest you read. A missing or changed file: copy that file again, once,
+then check again. Still failing, or no Python: carry on with the upgrade, tell the owner in the
+report that the kit could not be verified, and use §0's by-hand rule; `/campus-doctor` reports it.
+
+**c-ii. Unlisted files.** The kit holds only what the manifest lists. `install` moves any other
+file or cache to a new folder `.campus-os/kernel-quarantine/{UTC stamp}-{random}/` before copying
+(moved, never deleted: it may be someone's work) and says which. If `kernel-quarantine` itself is
+a link, it refuses and moves nothing: tell the owner; in Cowork, move them the same way with file
+tools. A link inside the kit is refused: tell the owner, who removes it. Tell the owner either
+way: something wrote into the kit.
+
+**d. Files only the kernel owns.** Kit files hold no owner data; overwrite them without asking
+(same rule as the 12e canons). The tool never writes through a symlink or outside
+`.campus-os/kernel/`; a link there is a finding to report, never something to follow. A kit file that differs from BOTH the old and the new manifest was
+edited by hand: copy it to `dean/archive/pre-v3/{date}/campus-os-kernel/` first and say so.
+Never copy `seat.json`, `host-binding.json` or anything outside the manifest into the kit.
+
+**e. Plugin-only tools.** `tools/gen_department_entries.py` (item 12e's org chart) reads the whole
+niche pack and is not in the kit. Run it from the plugin root where one shell sees both; otherwise
+skip the re-derive, say so, and leave the org chart as it is (owner additions are never touched
+either way).
 

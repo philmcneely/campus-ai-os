@@ -79,7 +79,7 @@ all exact names before any case-insensitive one, so `offers.md` beat
 `OFFERS-SUMMARY.MD` and `icp.md` beat `AUDIENCE.MD` - priority lost to
 capitals. Codex audit F1.) The machine form
 of this order is `read_order` on each row of `contracts/campus.json`;
-`tools/resolve_context.py` applies it.
+`{kernel}/tools/resolve_context.py` applies it.
 
 - **Why founding first.** Before 5.2.12 the canonical name was tried first. A
   team that "wrote if missing" a thin `icp.md` or `identity.md` beside the full
@@ -99,10 +99,14 @@ founding name (or the canonical name where there is no founding name).
 **Campus rule (one owner for detection).** A folder is a campus when it holds
 `workspace.json` and an accepted entry file (`CLAUDE.md`, `AGENTS.md`,
 `AGENTS.override.md` or `CODEX.md`) either at the root or in `dean/`. Find it by
-walking up from the working folder. Never test for a fixed folder name such as
+walking up from the working folder; if nothing above is a campus, accept exactly one campus among its children
+(one level down, real folders only, hidden folders and links skipped). Hosts often open the folder above the
+campus (Cowork mounting `TrainingSites/` for `TrainingSites/Claude-Cowork/`). Two or more child campuses:
+never pick one - list them and ask the owner, then use that folder. Never test for a fixed folder name such as
 `Claude-Cowork/`, and never for one entry-file name alone: the owner names the
-folder, and the entry file differs per host. `tools/resolve_context.py
---find-campus` prints the root.
+folder, and the entry file differs per host. `python3 -I -B {kernel}/tools/resolve_context.py
+--find-campus` prints the root (`{kernel}` = the campus kit, `.campus-os/kernel`; rules in
+`.campus-os/run-id-and-interop.md` §0).
 
 ## Where the dir is (§5A.3)
 - Founded campus: `{campus_root}/shared/` — resolve `campus_root` as the directory holding `workspace.json`. Never hard-code a campus folder name; the owner chose it.

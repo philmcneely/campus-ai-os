@@ -8,8 +8,8 @@ and the history behind each one, keyed by the section name in the JSON.
 ## Running it
 
 ```
-python3 tools/doctor_evidence.py --campus-root {campus_root} --json
-       [--today YYYY-MM-DD] [--window N] [--scheduled-json PATH|-] [--sweep]
+python3 -I -B .campus-os/kernel/tools/doctor_evidence.py --campus-root {campus_root} --json
+       [--kit-manifest PATH|-] [--installed-version X.Y.Z] [--today YYYY-MM-DD] [--window N] [--scheduled-json PATH|-] [--sweep]
 ```
 
 - `--today` pins the as-of date (default: today, UTC). Same campus + same
@@ -21,7 +21,12 @@ python3 tools/doctor_evidence.py --campus-root {campus_root} --json
   stdin and is the ONLY way stdin is read (an open pipe with no flag never
   blocks). Relative paths are campus-relative.
 - `--sweep` forces the fleet sweep outside the monthly window.
-- JSON shape: `generated.today` plus twelve sections, each
+- `--kit-manifest` is the installed plugin's `tools/kit-manifest.json`
+  (`-` = stdin; only one of it and `--scheduled-json` may use stdin). Pass it
+  whenever the tool runs from the campus kit: the kit's own stamp and manifest
+  copy say what the KIT claims, not what the plugin is. It also supplies the
+  installed version; `--installed-version` overrides that.
+- JSON shape: `generated.today` plus thirteen sections, each
   `{status, detail, line}`. Statuses: `ok`, `opportunity`, `needs-decision`,
   `skipped`, `error`. Without `--json` the tool prints each section's `line`
   in check order - the same lines the report shows.
@@ -93,6 +98,42 @@ contract's manifest probe order). All equal -> `[OK] Version current (v{x})`.
   tree whose homes disagree. This is the same fact checked after install,
   where upgrades stamp one home at a time.
 
+## `kernel_kit` (new, kernel kit)
+
+The campus copy of the kernel tools, `.campus-os/kernel/` (`tools/kernel_kit.py`;
+rules in `.campus-os/run-id-and-interop.md` §0). Checks the `core` tier file
+by file (sha256) against the INSTALLED PLUGIN's kit manifest (this tree's when
+the tool runs from the plugin, else `--kit-manifest`) and compares versions.
+Never against the campus `KIT.json` alone: anyone who can edit a kit file can
+edit that too. A kit file that is a symlink counts as changed.
+
+- `ok` -> `[OK] Kernel kit current (v{x}), every file present matches the plugin and nothing else is in it`.
+  Core files must be present; on-demand files that are present must match.
+- `needs-decision`, unlisted files -> the kit holds a file, cache or link the
+  plugin does not list (Codex audit F1, 5.2.14: an extra `secrets.py` or a
+  planted `__pycache__` would have run while every listed file checked). Do
+  not run it; /update-workspace moves plain files to
+  `.campus-os/kernel-quarantine/` (never deletes them) and re-checks; a link is
+  refused for the owner to remove.
+- `opportunity`, matches its own stamp only -> the tool ran from the kit with
+  no `--kit-manifest`; re-run with it before calling the kit healthy.
+- `opportunity`, not present -> a campus founded or upgraded before the kit
+  existed: "/update-workspace copies it." Tools still run from the plugin
+  where one shell sees both.
+- `needs-decision`, files missing or changed -> stop running the kit; offer
+  /update-workspace (item 18 re-copies them). A changed kit file is never
+  "fixed" by editing it, and an unexplained change is worth telling the owner
+  about: something wrote to their campus.
+- `needs-decision`, stale (kit older than the plugin) -> offer
+  /update-workspace.
+- `needs-decision`, newer (kit says a later version than the plugin) -> do
+  not run the kit. Either the plugin on this machine is out of date (update
+  it) or the stamp is wrong or planted (on the owner's go, item 18 repairs the
+  kit with `--repair`). Never copy an older kit over it without that go.
+- *Rationale:* found 2026-10-21 on Email Desk tests in Cowork - the plugin
+  ran in a cloud container that could not see the campus, so run_ids were
+  typed by hand and no validator ran. The doctor itself could not run.
+
 ## `registry` (old 3, 7, 7b)
 
 Runs `validate_registry.py --json` (entries, counts, failures) and
@@ -149,6 +190,16 @@ Runs `validate_results.py --json`: how many `results.json` envelopes exist,
 counts by schema version, how many fail. `error` when any fails - name the
 count; the run directory is that team's problem, not the campus's.
 `skipped` when the campus has none yet.
+
+**Report, never repair.** Do not add or change fields in a failing
+`results.json`. Only the team that made the run writes it
+(`.campus-os/run-id-and-interop.md` §3, append-only, per team); a
+`generated_at` filled in now carries the doctor's time, not the run's, and
+`completion` is a self-report that is never inferred. Name the file, its
+missing fields and the owning team, and offer: update that team, then re-run
+it. *Found 2026-10-22 on the 5.2.14 Cowork test:* the doctor "fixed" Email
+Desk's week file by stamping its own time and guessing all three completion
+answers.
 
 ## `schedules` (old 10)
 
