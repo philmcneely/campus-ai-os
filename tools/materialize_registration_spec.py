@@ -30,7 +30,9 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import os
 import re
+import secrets
 import sys
 from pathlib import Path
 
@@ -39,9 +41,38 @@ SPEC_REL = Path(".campus-os") / "registration-block-spec.md"
 OVR_REL = Path(".campus-os") / "registration-overrides.json"
 DEPT_LINE = re.compile(r'^(\s*"department"\s*:\s*")([^"]+)(".*)$', re.M)
 STAMP_RE = re.compile(r"^<!-- campus-ai-os:registration-block-spec materialized \| template_sha256=([0-9a-f]{64}) "
-                      r"\| overrides_sha256=([0-9a-f]{64}|none) \| kernel=([^ |]+) \| generated=([^ ]+) -->\s*$")
+                      r"\| overrides_sha256=([0-9a-f]{64}|none) \| kernel=([^ |]+)"
+                      r"(?: \| body_sha256=([0-9a-f]{64}))? \| generated=([^ ]+) -->\s*$")
 DEPT_ID = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 NOTES_HEADING = "## Campus notes (owner-written; preserved across upgrades)"
+
+
+class Unsafe(Exception):
+    """A path on the way to a campus file is a link."""
+
+
+def safe_write(campus, rel, text):
+    """Write a campus file without following links (5.2.18): every existing folder from the campus
+    root down, and the file itself, must be real; the new bytes go to a fresh temp file renamed into
+    place, which replaces a file and never writes through one."""
+    root = Path(campus).resolve()
+    node = root
+    for part in Path(rel).parts:
+        node = node / part
+        if node.is_symlink():
+            raise Unsafe(f"{node} is a symlink; refusing to write through it")
+    dest = root / rel
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_name(f".{dest.name}.{secrets.token_hex(4)}.tmp")
+    with open(tmp, "x", encoding="utf-8") as handle:
+        handle.write(text)
+    os.replace(tmp, dest)
+    return dest
+
+
+def body_of(text):
+    """The spec without its stamp line (render writes stamp + blank line + body)."""
+    return text.split("\n", 2)[2] if text.count("\n") >= 2 else ""
 
 
 def sha(data):
@@ -97,8 +128,11 @@ def render(template_text, overrides, kernel_ver, template_hash, overrides_hash, 
     body = template_text[:m.start()] + m.group(1) + " | ".join(values) + m.group(3) + template_text[m.end():]
     if overrides["annotations"]:
         body = body.rstrip("\n") + "\n\n" + NOTES_HEADING + "\n\n" + "\n".join(overrides["annotations"]) + "\n"
+    # body_sha256 (5.2.18): the stamp records what the body WAS, so an edit made after generation is
+    # seen even when the inputs are unchanged - the stamp alone used to report it "current".
     stamp = (f"<!-- campus-ai-os:registration-block-spec materialized | template_sha256={template_hash} "
-             f"| overrides_sha256={overrides_hash} | kernel={kernel_ver} | generated={generated} -->\n\n")
+             f"| overrides_sha256={overrides_hash} | kernel={kernel_ver} | body_sha256={sha(body)} "
+             f"| generated={generated} -->\n\n")
     return stamp + body
 
 
@@ -106,7 +140,7 @@ def parse_stamp(text):
     first = text.split("\n", 1)[0]
     m = STAMP_RE.match(first)
     return {"template_sha256": m.group(1), "overrides_sha256": m.group(2),
-            "kernel": m.group(3), "generated": m.group(4)} if m else None
+            "kernel": m.group(3), "body_sha256": m.group(4), "generated": m.group(5)} if m else None
 
 
 def status(campus, kernel):
@@ -125,11 +159,24 @@ def status(campus, kernel):
     if not spec.is_file():
         out["state"] = "missing"
         return out
-    stamp = parse_stamp(spec.read_text(encoding="utf-8"))
+    text = spec.read_text(encoding="utf-8")
+    stamp = parse_stamp(text)
     if stamp is None:
         out["state"] = "hand-edited"
         return out
     out["materialized_from_kernel"] = stamp["kernel"]
+    inputs_current = stamp["template_sha256"] == t_hash and stamp["overrides_sha256"] == o_hash
+    if stamp["body_sha256"]:
+        edited = sha(body_of(text)) != stamp["body_sha256"]
+    elif inputs_current:  # an older stamp without a body hash: re-render from the same inputs and compare
+        edited = body_of(text) != body_of(render(tmpl.read_text(encoding="utf-8"), ovr, "", t_hash, o_hash, ""))
+    else:  # older stamp, inputs moved on: the old body cannot be rebuilt, so it is unverifiable
+        edited = None
+        out["unverifiable"] = True
+    if edited:
+        out["state"] = "hand-edited"
+        out["edited_after_stamp"] = True
+        return out
     if stamp["template_sha256"] != t_hash:
         out["state"] = "stale-template"
     elif stamp["overrides_sha256"] != o_hash:
@@ -197,7 +244,7 @@ def main(argv=None):
             msg = {"current": f"[OK] Registration spec current (kernel {st['kernel']}; {n} campus department override(s), {st['annotations']} note line(s))",
                    "stale-template": f"[--] Registration spec predates the installed kernel (materialized from {st.get('materialized_from_kernel')}, installed {st['kernel']}) - say \"refresh the spec\"",
                    "overrides-drift": "[--] Registration overrides changed since the spec was materialized - say \"refresh the spec\"",
-                   "hand-edited": "[--] Registration spec is hand-edited (no materialization stamp) - say \"capture my spec notes\" and I'll keep them as overrides",
+                   "hand-edited": "[--] Registration spec was edited by hand after it was generated - say \"capture my spec notes\" and I'll keep them as overrides",
                    "missing": "[!!] Registration spec missing - /update-workspace writes it"}[st["state"]]
             print(msg)
         return 0 if st["state"] == "current" else 1
@@ -216,8 +263,11 @@ def main(argv=None):
             print(json.dumps(cap, indent=2))
             return 0
         else:
-            ovr_path.parent.mkdir(parents=True, exist_ok=True)
-            ovr_path.write_text(json.dumps(cap, indent=2) + "\n", encoding="utf-8")
+            try:
+                safe_write(campus, OVR_REL, json.dumps(cap, indent=2) + "\n")
+            except Unsafe as exc:
+                print(f"REFUSED(1): {exc}", file=sys.stderr)
+                return 1
             print(f"captured {len(cap['departments_extra'])} department override(s), {len(cap['annotations'])} note line(s) -> {ovr_path}")
 
     st = status(campus, kernel)
@@ -239,23 +289,24 @@ def main(argv=None):
         # idempotent: same inputs -> only the generated= stamp differs; do not rewrite
         strip = lambda t: re.sub(r"generated=[^ ]+", "generated=", t, count=1)
         changed = strip(old) != strip(text)
+    backup = None
     if changed:
-        spec.parent.mkdir(parents=True, exist_ok=True)
         try:
-            spec.write_text(text, encoding="utf-8")
-        except PermissionError:
-            # Some campuses keep the copy read-only (found on the reference campus:
-            # mode 444). It is a generated file, so restore the owner write bit
-            # and retry once; anything else is a real refusal.
-            import os
-            import stat
-            try:
-                os.chmod(spec, os.stat(spec).st_mode | stat.S_IWUSR)
-                spec.write_text(text, encoding="utf-8")
-            except OSError as exc:
-                print(f"REFUSED(1): cannot write {spec}: {exc}", file=sys.stderr)
-                return 1
-    result = {"spec": str(spec), "written": changed, "state_before": st["state"],
+            # Keep the old copy whenever it holds edits, or whenever an older stamp can't prove it doesn't:
+            # captured overrides carry the owner's lines, the backup is the safety net (5.2.18).
+            if spec.is_file() and (st["state"] == "hand-edited" or st.get("unverifiable")):
+                stamp_now = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+                backup = str(safe_write(campus, SPEC_REL.parent / f"{SPEC_REL.name}.bak-{stamp_now}",
+                                        spec.read_text(encoding="utf-8")))
+            # A temp file renamed into place: also replaces a read-only (mode 444) copy without chmod.
+            safe_write(campus, SPEC_REL, text)
+        except Unsafe as exc:
+            print(f"REFUSED(1): {exc}", file=sys.stderr)
+            return 1
+        except OSError as exc:
+            print(f"REFUSED(1): cannot write {spec}: {exc}", file=sys.stderr)
+            return 1
+    result = {"spec": str(spec), "written": changed, "state_before": st["state"], "backup": backup,
               "departments_extra": ovr["departments_extra"], "annotations": len(ovr["annotations"])}
     if a.json:
         print(json.dumps(result, indent=2))

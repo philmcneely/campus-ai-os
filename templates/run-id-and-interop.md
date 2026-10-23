@@ -41,8 +41,10 @@ file). Founding writes it; `/update-workspace` and `/campus-doctor` refresh it.
     the edited file: `python3 -I -B -c 'import hashlib,os;k=".campus-os/kernel";[print("LINK" if os.path.islink(p) else hashlib.sha256(open(p,"rb").read()).hexdigest(), os.path.relpath(p,k)) for d,ds,fs in os.walk(k) for p in sorted(os.path.join(d,x) for x in ds+fs) if os.path.islink(p) or os.path.isfile(p)]'`.
     It lists every file and link in the kit. Each line must be in the manifest's `files` with the
     same hash; the only other line allowed is `KIT.json`. Any extra line (an unlisted file, a cache,
-    a `LINK`) or any manifest file missing → the kit fails. Also compare `KIT.json`'s
-    `kernel_version` with the manifest's.
+    a `LINK`) → the kit fails. Every `tiers.core` file must be listed; a `tiers.on_demand` file may
+    be absent (founding copies the core only) unless the tool you are about to run is one of them,
+    and any on-demand file that is present must match. Also compare `KIT.json`'s `kernel_version`
+    with the manifest's. This is the same rule `kernel_kit.py check` applies.
   - All hashes match, nothing extra, and the versions are equal → use the kit. Stale, missing,
     changed, extra, or a link → do not run it; run `/update-workspace` (it moves unlisted files to
     `.campus-os/kernel-quarantine/` and re-copies the kit; a link is left for the owner), or this once use

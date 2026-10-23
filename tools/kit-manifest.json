@@ -1,9 +1,9 @@
 {
   "dir": ".campus-os/kernel",
   "files": {
-    ".claude-plugin/plugin.json": "0d8660825e5d29efb302ecfc78194ab5283eea99e031a98c118034f38c9ee26e",
-    ".codex-plugin/plugin.json": "4b60715fa2019ba95f0554aa9adcf68f4f0a34123b3322fca7762295f859fdae",
-    "contracts/campus.json": "14029a362e7ce78de55b861ae942540d5d17eb5c580033ea25987684a2448ff9",
+    ".claude-plugin/plugin.json": "a13afa00a2110ef12907f513f4a40ca33cc12434c50978bf5d2a42780461c7cb",
+    ".codex-plugin/plugin.json": "5e564bd37374453b4799d74b73fde6a3a949910b24302fbd99ad3fe83cb56122",
+    "contracts/campus.json": "4768c3c3642d5af2e56ec101fbdd29affa93e8a5bd0f5dd09cc2855a4c13544d",
     "schemas/results.schema.json": "e4beae70ed38b1bf57c5e4e5c6cd8862332d6508e055bd3182a37450171592d4",
     "templates/context-files.md": "1f59f74c08385273b47a4bf388674dffe8bb2e9e393069436c9214d38cbcb5a8",
     "templates/registration-block-spec.md": "9ae8b800057966142e88aff3da4ef88c1d4dc0cb2f0406e389ed2be01dcfbdf6",
@@ -14,15 +14,15 @@
     "tools/doctor_evidence.py": "9f79d3e4cfb1428fd11b516f9182d3043d7b1333b04cfc6cda2785b47dd0a609",
     "tools/generate_task_index.py": "aa6c60414640dd6b6ccb9977c4dd9aef9d3c44fe03da06a7167e53a84a326958",
     "tools/kernel_kit.py": "bbf4399a2215c8c1ec132661b43218b67300115354c3d4df82ce0ea01dc001e1",
-    "tools/materialize_registration_spec.py": "0b32debbc76da6ad0122567c0ce8803f0815ce8497ef663b585cb9f82e379059",
-    "tools/mint_run_id.py": "2fc091016760cd322b169a414d6a114c9e73ddcc98b66a1a2274426e27d332e5",
+    "tools/materialize_registration_spec.py": "a550bc22839ac100c28ca61284c61df125ed6cdb36e28b055baefd4b3a24b2e8",
+    "tools/mint_run_id.py": "27603f28ef599fb3a1e0fe003e7567a37aa0defd65c7f8aa0abb3d819538dc9c",
     "tools/prune-write.mjs": "077474c45368f8145e5a1553c300e3830f0d03c52b5972daffcb1590c89ade78",
     "tools/resolve_context.py": "6b2a057a511ad8ad84431d37747c140ac2f5902301d142810bc98ebadc8ed0c5",
     "tools/seat_contract_checks.py": "4104e846c96a9d59caecacdead02724ed35eede46147e38109323411316528ec",
     "tools/validate_registry.py": "2e7da827057f0e1e6e63faa09c6a0ed8a51e29cce552dbbb27ff685d2d3aad75",
     "tools/validate_results.py": "1b0ac32495295d9fae08770efeb4d7b1792ad78a7fd7f1a5dc0a56c4d9607d3e"
   },
-  "kernel_version": "5.2.17",
+  "kernel_version": "5.2.18",
   "kit": "campus-os-kernel-kit",
   "tiers": {
     "core": [

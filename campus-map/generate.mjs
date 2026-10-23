@@ -1074,9 +1074,26 @@ const CLIENT_JS = `
 
 // ---- write ---------------------------------------------------------------
 const html = renderHTML(JSON.stringify(data), brand);
-fs.mkdirSync(OUT_DIR, { recursive: true });
-const OUT_FILE = path.join(OUT_DIR, 'campus-map.html');
-fs.writeFileSync(OUT_FILE, html, 'utf8');
+// 5.2.18: never write through a link. A campus can be shared, so `campus-map/` (or the file) may be
+// a planted link; following it would overwrite a file outside the campus. Under the campus root every
+// folder on the way down must be real; anywhere, the file is written fresh and renamed into place,
+// which replaces a link instead of writing through it.
+function isLink(p) { try { return fs.lstatSync(p).isSymbolicLink(); } catch { return false; } }
+function refuse(msg) { console.error('Campus Map: refused - ' + msg); process.exit(1); }
+const rootAbs = path.resolve(ROOT), outAbs = path.resolve(OUT_DIR);
+if (outAbs === rootAbs || outAbs.startsWith(rootAbs + path.sep)) {
+  let node = rootAbs;
+  for (const part of path.relative(rootAbs, outAbs).split(path.sep).filter(Boolean)) {
+    node = path.join(node, part);
+    if (isLink(node)) refuse(node + ' is a symlink');
+  }
+}
+fs.mkdirSync(outAbs, { recursive: true });
+if (isLink(outAbs)) refuse(outAbs + ' is a symlink');
+const OUT_FILE = path.join(outAbs, 'campus-map.html');
+const TMP_FILE = path.join(outAbs, '.campus-map.' + process.pid + '.' + crypto.randomBytes(4).toString('hex') + '.tmp');
+fs.writeFileSync(TMP_FILE, html, { encoding: 'utf8', flag: 'wx' });
+fs.renameSync(TMP_FILE, OUT_FILE);
 console.log('Campus Map written: (private)', '→', OUT_FILE);
 console.log('  orchestrator:', orchestrator, '| brand:', brand.name, '| heading:', brand.headingFont, '| navy', brand.colors.navy);
 console.log('  ' + data.totals.runs + ' runs · ' + data.totals.deliverables + ' deliverables · ~' +

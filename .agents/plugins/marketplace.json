@@ -1,0 +1,17 @@
+{
+  "name": "campus-ai-os",
+  "interface": {
+    "displayName": "Campus AI OS",
+    "shortDescription": "Free AI operating system for education businesses: a chief of staff, departments and starter staff.",
+    "developerName": "TrainingSites.io",
+    "websiteURL": "https://trainingsites.io/os"
+  },
+  "plugins": [
+    {
+      "name": "campus-ai-os",
+      "source": {"source": "path", "path": "./"},
+      "policy": {"installation": "AVAILABLE"},
+      "category": "Productivity"
+    }
+  ]
+}

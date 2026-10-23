@@ -4,6 +4,24 @@ All notable changes to the Campus AI OS kernel. Format follows Keep a Changelog;
 
 ## [Unreleased]
 
+## [5.2.18] - 2026-10-22
+
+Repairs the four findings of the Codex audit of the public 5.2.17 repository and release (`outputs/2026-10/reports/2026-10-22-campus-ai-os-github-audit.md`, WO-2026-10-22-04; WO-2026-10-20-06).
+
+### Security
+- **Runtime writers stay inside the campus (audit F1, P1).** The run-ID minter, the registration-spec writer and the Campus Map followed a planted link out of the campus: `outputs` linked elsewhere put a run (and every draft written into it) outside; a dangling link at the spec created the outside target; a linked `campus-map/` overwrote an outside file. Now:
+  - the minter creates the run directory one folder at a time, refuses any link on the way down (the standalone path too), and checks that the result resolves inside the campus; its `results.json` is still opened exclusively;
+  - the spec writer (and `--capture-notes`) refuses a link anywhere from the campus root to the file, and writes a fresh temp file renamed into place, which also replaces a read-only copy without the old chmod;
+  - the Campus Map refuses a link on the way down to its output folder under the campus, and writes a fresh temp file renamed into place, so a link at the file itself is replaced, never written through (custom output folders get the second guard).
+
+### Fixed
+- **Developer install route (audit F2, P1).** The README's `/plugin marketplace add trainingsites/campus-ai-os` (Claude Code) and Codex "Add marketplace" pointed at a repo with no marketplace catalog. The kernel tree now carries `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`, both named `campus-ai-os` with the root plugin as source; Codex CLI 0.163 registers the repo as a marketplace. The buyer's `.plugin`/`.zip` leaves both catalogs out.
+- **An edit under an intact stamp is no longer called current (audit F3, P2).** The spec stamp now records the body's sha256; `--check` reports a body that changed after generation as hand-edited, a refresh refuses until the edits are captured as overrides, and the replaced copy is kept as `registration-block-spec.md.bak-{UTC}`. Older stamps without a body hash are compared against a fresh render from the same inputs, or backed up when that cannot be rebuilt.
+- **The Cowork kit rule matches the checker (audit F4, P2).** Canon §0 required every manifest file, but founding copies the core tier only, so a healthy new campus failed the written rule. Now: every core file required, on-demand files optional unless the tool about to run is one of them, any present file must match, any unlisted entry fails, the same as `kernel_kit.py check`.
+
+### Added
+- `tests/test_containment_5218.py` (14): links at `outputs`, deeper in the run path and at `teams-shared` refused with nothing written outside; a dangling spec link and a linked `.campus-os` refused; stamped edits seen, refresh refused, then captured and backed up; an old stamp still checked; Campus Map folder and file links; the cloud rule and the checker agree on core-only, full and changed kits; both catalogs valid and absent from the buyer file. Mutation-checked: each fix removed makes its fixtures fail.
+
 ## [5.2.17] - 2026-10-22
 
 Carries all of 5.2.16 (kernel kit, the Codex F1 repair, the campus finder) plus one fix found while the 5.2.16 audit was under way (WO-2026-10-20-06).

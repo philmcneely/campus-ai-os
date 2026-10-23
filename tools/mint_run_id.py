@@ -85,6 +85,29 @@ def run_path(campus_root: str | Path, team: str, slug: str, *, kind: str = "team
     return base / _segment(run_id, "run_id") if run_id else base
 
 
+def _contained_mkdir(root: Path, target: Path) -> None:
+    """Create the run directory one folder at a time, refusing any link on the way down.
+
+    A campus can be shared, so `outputs` (or any folder under it) may be a planted link; following it
+    would put the run, and every draft the team then writes into it, outside the campus (5.2.18)."""
+    root = root.resolve()
+    node = root
+    parts = target.relative_to(root).parts
+    for i, part in enumerate(parts):
+        node = node / part
+        if node.is_symlink():
+            raise MintRefused(f"link-in-path: {node} is a symlink; a run directory never follows a link")
+        if i == len(parts) - 1:
+            node.mkdir()  # the run itself: must be new
+        elif not node.exists():
+            node.mkdir()
+        elif not node.is_dir():
+            raise MintRefused(f"not-a-folder: {node}")
+    real = target.resolve()
+    if real != root and root not in real.parents:
+        raise MintRefused(f"escape: {target} resolves outside the campus")
+
+
 def _stub(run_id: str, team: str, generated: dt.datetime) -> dict:
     # Envelope v1.1 (schemas/results.schema.json): the completion-only stub now
     # carries an empty assets[] so one schema validates every emitter.
@@ -137,10 +160,10 @@ def mint(slug: str, *, campus_root: str | Path = ".", team: str | None = None,
             raise MintRefused(f"collision-exhausted: {base / base_id}")
 
     try:
-        target.mkdir(parents=True, exist_ok=False)
+        _contained_mkdir(Path(campus_root), target)
     except FileExistsError as exc:
         raise MintRefused(f"existing-run-dir: {target}") from exc
-    results = target / "results.json"
+    results = target / "results.json"  # opened with "x": never follows or replaces an existing entry
     try:
         with results.open("x", encoding="utf-8") as handle:
             json.dump(_stub(chosen, team, now), handle, indent=2)

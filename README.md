@@ -9,7 +9,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-20BF55?style=flat-square" alt="License: MIT"/></a>
   <img src="https://img.shields.io/badge/Claude-Desktop%20%C2%B7%20Cowork%20%C2%B7%20Code-0B4F6C?style=flat-square" alt="Claude compatible"/>
   <img src="https://img.shields.io/badge/Codex-compatible-0B4F6C?style=flat-square" alt="Codex compatible"/>
-  <img src="https://img.shields.io/badge/kernel%20fixtures-251%20passing-20BF55?style=flat-square" alt="251 fixtures"/>
+  <img src="https://img.shields.io/badge/kernel%20fixtures-287%20passing-20BF55?style=flat-square" alt="287 fixtures passing"/>
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
 **An AI staff that remembers your business. One folder. One chief of staff. A team you can use from Claude or Codex.**
 
 <p align="center">
-  <a href="https://github.com/trainingsites/campus-ai-os/releases/latest/download/campus-ai-os-v5.2.17.plugin"><strong>⬇️ Download the plugin (one file, free)</strong></a>
+  <a href="https://github.com/trainingsites/campus-ai-os/releases/latest/download/campus-ai-os-v5.2.18.plugin"><strong>⬇️ Download the plugin (one file, free)</strong></a>
   &nbsp;·&nbsp;
   <a href="https://trainingsites.io/os"><strong>🎓 Get the free guided setup at TrainingSites.io</strong></a>
 </p>
@@ -93,7 +93,7 @@ Honest note: the founding interview takes real attention, and the first run will
 
 ### Claude Desktop or Cowork (no terminal)
 
-Download `campus-ai-os-v5.2.17.plugin` from the [latest release](https://github.com/trainingsites/campus-ai-os/releases/latest), then install it from **Settings → Plugins → Install from file**.
+Download `campus-ai-os-v5.2.18.plugin` from the [latest release](https://github.com/trainingsites/campus-ai-os/releases/latest), then install it from **Settings → Plugins → Install from file**.
 
 ### Developer paths
 
@@ -157,7 +157,18 @@ Departments provide ownership. Playbooks provide sequence and verification. Skil
 
 ---
 
-## What is new in v5.2.17
+## What is new in v5.2.18
+
+- **Every write stays inside your campus.** The run-ID maker, the registration-spec writer and the Campus Map now refuse a link that would point outside the campus, and write fresh files instead of writing through existing ones.
+- **Install as a marketplace.** The repo now carries marketplace catalogs, so the Claude Code and Codex instructions below work as written.
+- **Your edits to the registration spec are never lost.** An edit made after the file was generated is noticed; a refresh asks to keep it as an override first, and backs up the old copy.
+- **Cowork check matches the checker.** A new campus with only the core tools passes, as it should.
+
+320 automated fixtures back the release (287 run in this repo; 33 need a full campus and are skipped here), plus a live run on an owner's campus. Full detail in [CHANGELOG.md](CHANGELOG.md).
+
+---
+
+## What was new in v5.2.17
 
 - **Works in cloud Cowork.** Cowork runs plugins in a cloud container that can't see your campus folder, so the kernel's own tools couldn't run there. Your campus now keeps a checked copy of them in `.campus-os/kernel/`: work gets real run IDs, results are validated, and `/campus-doctor` runs. `/campus-start` writes the copy and `/update-workspace` adds it to an existing campus.
 - **The copy runs only what it checked.** It is verified against the plugin, never against itself; any file the plugin doesn't list (an extra module, a cache, a link) means it isn't run, and repair moves unknown files to a quarantine folder instead of deleting them.
@@ -188,7 +199,7 @@ Departments provide ownership. Playbooks provide sequence and verification. Skil
 | Playbooks | 2 | Weekly Reset and One Recording to a Week of Content, plus the runtime that executes them |
 | Niche packs | 2 | The education pack (default) for educators, coaches, course creators, and consultants, and a professor pack. The active pack (`packs/active.json`, its `identity.business_noun`) sets what kind of business your staff talks about |
 | Tools | 22 | Packaging, validation, health evidence, seat resolution, contracts, and workspace checks |
-| Tests | 306 | Automated fixtures that protect installation, upgrades, security boundaries, and multi-client operation |
+| Tests | 320 | Automated fixtures that protect installation, upgrades, security boundaries, and multi-client operation |
 
 ### Useful commands
 

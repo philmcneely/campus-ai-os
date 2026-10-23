@@ -46,6 +46,9 @@ DEFAULT_SRC = Path(__file__).resolve().parent.parent
 # change the artifact hash.
 EXCLUDE_DIRS = {".git", "__pycache__", ".DS_Store", "node_modules", ".pytest_cache", "tests"}
 EXCLUDE_FILES = {".DS_Store"}
+# Marketplace catalogs serve the public Git repo (Claude Code `/plugin marketplace add`, Codex "Add
+# marketplace"); a buyer's installable file never needs them (5.2.18, audit of the public 5.2.17).
+EXCLUDE_PATHS = {".claude-plugin/marketplace.json", ".agents/plugins/marketplace.json"}  # one catalog per host, see PLATFORM.md
 
 MANIFEST_PROBE = (".claude-plugin/plugin.json", ".codex-plugin/plugin.json", "plugin.json")
 FRONTMATTER_VERSION_RE = re.compile(r"^version:\s*([0-9]+\.[0-9]+\.[0-9]+)\s*$", re.M)
@@ -191,7 +194,7 @@ def collect(src: Path):
         rel = p.relative_to(src)
         if any(part in EXCLUDE_DIRS for part in rel.parts):
             continue
-        if rel.name in EXCLUDE_FILES:
+        if rel.name in EXCLUDE_FILES or rel.as_posix() in EXCLUDE_PATHS:
             continue
         files.append((p, rel))
     return files

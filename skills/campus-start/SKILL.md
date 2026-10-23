@@ -6,7 +6,7 @@ description: >
   built to match; niche framing from the active pack. Use when
   the owner says "/campus-start", "set up my campus", "found my campus", or
   when no campus exists.
-version: 5.2.17
+version: 5.2.18
 department: kernel
 ---
 
